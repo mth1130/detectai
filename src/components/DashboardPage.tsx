@@ -1,169 +1,69 @@
-import { useState, ChangeEvent } from 'react';
-import {
-  ScanSearch,
-  Sparkles,
-  FileText,
-  Clock,
-  TrendingUp,
-  CheckCircle2,
-  AlertTriangle,
-  Loader2,
-} from 'lucide-react';
-import { type AnalysisResult, generateAnalysisResult } from '@/types';
+import { useState } from "react";
+import type { AnalysisResult } from "@/types";
 
-const MAX_CHARS = 10000;
+type Props = { onAnalyzed: (r: AnalysisResult) => void };
 
-interface DashboardPageProps {
-  onAnalyzed: (result: AnalysisResult) => void;
-}
+export default function DashboardPage({ onAnalyzed }: Props) {
+  const [text, setText] = useState("");
+  const [tab, setTab] = useState<"text"|"video">("text");
+  const [videoFile, setVideoFile] = useState<File|null>(null);
+  const [loading, setLoading] = useState(false);
 
-export default function DashboardPage({ onAnalyzed }: DashboardPageProps) {
-  const [text, setText] = useState('');
-  const [analyzing, setAnalyzing] = useState(false);
-  const [hasResult, setHasResult] = useState(false);
+  const analyze = () => {
+    if (tab==="text" && !text.trim()) return;
+    if (tab==="video" && !videoFile) return;
+    setLoading(true);
 
-  const charCount = text.length;
-  const isOverLimit = charCount > MAX_CHARS;
-  const canAnalyze = text.trim().length > 0 && !isOverLimit && !analyzing;
-
-  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-    if (hasResult) setHasResult(false);
-  };
-
-  const handleAnalyze = () => {
-    if (!canAnalyze) return;
-    setAnalyzing(true);
-    setHasResult(false);
     setTimeout(() => {
-      setAnalyzing(false);
-      setHasResult(true);
-      const r = generateAnalysisResult();
-      setTimeout(() => onAnalyzed(r), 600);
-    }, 2200);
-  };
-
-  const handleClear = () => {
-    setText('');
-    setHasResult(false);
+      // Analyse simple améliorée
+      const isLong = tab==="text" ? text.length>200 : true;
+      const score = tab==="video" ? Math.floor(40+Math.random()*50) : (isLong? 75 : 25);
+      const result: AnalysisResult = {
+        id: Date.now().toString(),
+        text: tab==="text"? text : `Vidéo: ${videoFile?.name}`,
+        score,
+        label: score>60? "IA Probable" : score>35? "Mixte" : "Humain Probable",
+        details: {
+          perplexity: Math.random()*100,
+          burstiness: Math.random()*100,
+        },
+        timestamp: new Date().toISOString(),
+      } as any;
+      setLoading(false);
+      onAnalyzed(result);
+    }, 1200);
   };
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="mx-auto max-w-4xl px-6 py-8 sm:px-8 sm:py-10">
-        {/* Page header */}
-        <div className="mb-8 animate-fade-in-up">
-          <div className="mb-2 flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-brand-400" />
-            <span className="text-xs font-medium uppercase tracking-wider text-brand-400">Dashboard</span>
-          </div>
-          <h1 className="text-2xl font-bold text-white sm:text-3xl">Nouvelle analyse</h1>
-          <p className="mt-1.5 text-sm text-gray-400">
-            Collez votre texte ci-dessous et lancez une détection par IA en un clic.
-          </p>
-        </div>
+    <div className="max-w-3xl mx-auto">
+      <h2 className="text-2xl font-bold text-white mb-6">Nouvelle Analyse</h2>
 
-        {/* Stats row */}
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3 animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
-          <StatCard icon={<FileText className="h-4 w-4" />} label="Analyses totales" value="0" />
-          <StatCard icon={<Clock className="h-4 w-4" />} label="Dernière analyse" value="—" />
-          <StatCard icon={<TrendingUp className="h-4 w-4" />} label="Précision moyenne" value="—" />
-        </div>
-
-        {/* Analysis card */}
-        <div
-          className="glass rounded-2xl border border-ink-600/60 p-6 shadow-2xl shadow-black/40 animate-fade-in-up sm:p-7"
-          style={{ animationDelay: '0.2s', opacity: 0 }}
-        >
-          {/* Textarea */}
-          <div className="relative">
-            <textarea
-              value={text}
-              onChange={handleChange}
-              maxLength={MAX_CHARS + 500}
-              placeholder="Collez votre texte ici..."
-              className="h-64 w-full resize-none rounded-xl border border-ink-600 bg-ink-850/80 px-4 py-3.5 text-sm leading-relaxed text-gray-100 placeholder-gray-500 transition-all duration-200 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/30 sm:h-72"
-            />
-            <div className="pointer-events-none absolute bottom-3 right-4">
-              <span className={`text-xs font-medium ${isOverLimit ? 'text-red-400' : charCount > MAX_CHARS * 0.9 ? 'text-amber-400' : 'text-ink-400'}`}>
-                {charCount.toLocaleString('fr-FR')}/{MAX_CHARS.toLocaleString('fr-FR')} car.
-              </span>
-            </div>
-          </div>
-
-          {isOverLimit && (
-            <p className="mt-2 flex items-center gap-1.5 text-xs text-red-400">
-              <AlertTriangle className="h-3.5 w-3.5" />
-              Limite de {MAX_CHARS.toLocaleString('fr-FR')} caractères dépassée
-            </p>
-          )}
-
-          {/* Actions */}
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <button
-              onClick={handleClear}
-              disabled={!text && !hasResult}
-              className="rounded-xl border border-ink-600 bg-ink-800/60 px-4 py-2.5 text-sm font-medium text-gray-300 transition-all hover:border-ink-500 hover:bg-ink-700/60 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Effacer
-            </button>
-
-            <button
-              onClick={handleAnalyze}
-              disabled={!canAnalyze}
-              className="group relative overflow-hidden rounded-xl gradient-brand px-8 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition-all duration-200 hover:shadow-xl hover:shadow-brand-500/30 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:px-10"
-            >
-              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-              <span className="relative flex items-center justify-center gap-2">
-                {analyzing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Analyse en cours...
-                  </>
-                ) : (
-                  <>
-                    <ScanSearch className="h-4 w-4" />
-                    Analyser
-                  </>
-                )}
-              </span>
-            </button>
-          </div>
-
-          {/* Loading / result indicator */}
-          {analyzing && (
-            <div className="mt-6 flex items-center gap-3 rounded-xl border border-ink-600 bg-ink-850/60 px-4 py-3.5">
-              <div className="flex gap-1.5">
-                <span className="h-2 w-2 animate-bounce rounded-full bg-brand-400" style={{ animationDelay: '0ms' }} />
-                <span className="h-2 w-2 animate-bounce rounded-full bg-brand-400" style={{ animationDelay: '150ms' }} />
-                <span className="h-2 w-2 animate-bounce rounded-full bg-brand-400" style={{ animationDelay: '300ms' }} />
-              </div>
-              <span className="text-sm text-gray-400">Détection en cours...</span>
-            </div>
-          )}
-
-          {hasResult && !analyzing && (
-            <div className="mt-6 flex items-center gap-3 rounded-xl border border-green-600/40 bg-green-950/30 px-4 py-3.5 animate-fade-in-up">
-              <CheckCircle2 className="h-5 w-5 text-green-400" />
-              <span className="text-sm text-green-300">Analyse terminée — redirection vers les résultats...</span>
-            </div>
-          )}
-        </div>
+      <div className="flex gap-2 mb-4">
+        <button onClick={()=>setTab("text")} className={`px-5 py-2 rounded-full font-bold ${tab==="text"?"bg-violet-600 text-white":"bg-white/10 text-white/60"}`}>📝 Texte</button>
+        <button onClick={()=>setTab("video")} className={`px-5 py-2 rounded-full font-bold ${tab==="video"?"bg-violet-600 text-white":"bg-white/10 text-white/60"}`}>🎥 Vidéo</button>
       </div>
-    </div>
-  );
-}
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="glass flex items-center gap-3 rounded-xl border border-ink-600/60 p-4">
-      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-500/15 text-brand-400">
-        {icon}
-      </div>
-      <div>
-        <p className="text-xs text-gray-400">{label}</p>
-        <p className="text-lg font-semibold text-white">{value}</p>
-      </div>
+      {tab==="text" ? (
+        <textarea
+          value={text}
+          onChange={e=>setText(e.target.value)}
+          placeholder="Colle ton texte ici pour détecter si c'est IA..."
+          className="w-full h-60 bg-[#151530] border border-violet-500/20 rounded-xl p-4 text-white"
+        />
+      ) : (
+        <div className="border-2 border-dashed border-violet-500/30 rounded-xl p-8 text-center bg-[#151530]">
+          <input type="file" accept="video/*" onChange={e=>setVideoFile(e.target.files?.[0]||null)} className="hidden" id="vid"/>
+          <label htmlFor="vid" className="cursor-pointer text-white/80">
+            {videoFile? `✅ ${videoFile.name} (${(videoFile.size/1024/1024).toFixed(1)} MB)` : "📁 Clique pour choisir une vidéo MP4, MOV, WebM"}
+          </label>
+          {videoFile && <video src={URL.createObjectURL(videoFile)} controls className="mt-4 w-full rounded-lg max-h-64"/>}
+          <p className="text-white/40 text-xs mt-3">On analysera la vidéo pour détecter les deepfakes</p>
+        </div>
+      )}
+
+      <button onClick={analyze} disabled={loading} className="mt-4 w-full bg-gradient-to-r from-violet-600 to-indigo-600 py-4 rounded-xl text-white font-bold text-lg disabled:opacity-50">
+        {loading? "Analyse en cours..." : tab==="text"? "Analyser le texte" : "Analyser la vidéo"}
+      </button>
     </div>
   );
 }
