@@ -1,103 +1,85 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function DashboardPage({ onAnalyzed }: any) {
   const [text, setText] = useState("");
   const [tab, setTab] = useState<"text"|"video">("text");
-  const [videoMode, setVideoMode] = useState<"file"|"link">("file");
-  const [videoFile, setVideoFile] = useState<File|null>(null);
-  const [videoLink, setVideoLink] = useState("");
-  const [preview, setPreview] = useState("");
+  const [mode, setMode] = useState<"file"|"link">("file");
+  const [file, setFile] = useState<File|null>(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [link, setLink] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!videoFile) { if(videoMode==="file") setPreview(""); return; }
-    const url = URL.createObjectURL(videoFile);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [videoFile]);
-
-  const isValidSocialLink = (url: string) => {
-    return url.includes("tiktok.com") || url.includes("instagram.com") || url.includes("youtu") || url.includes("facebook.com") || url.includes("fb.watch");
+  const handleFile = (e:any) => {
+    const f = e.target.files?.[0] as File;
+    if(!f) return;
+    setFile(f);
+    const url = URL.createObjectURL(f);
+    setPreviewUrl(url);
   };
 
   const analyze = () => {
-    if (tab==="text" &&!text.trim()) { alert("Écris un texte d'abord"); return; }
-    if (tab==="video" && videoMode==="file" &&!videoFile) { alert("Choisis une vidéo"); return; }
-    if (tab==="video" && videoMode==="link" &&!videoLink.trim()) { alert("Colle un lien TikTok / Insta / YouTube"); return; }
+    if(tab==="text" &&!text.trim()) return alert("Écris un texte");
+    if(tab==="video" && mode==="file" &&!file) return alert("Choisis une vidéo");
+    if(tab==="video" && mode==="link" &&!link.trim()) return alert("Colle un lien TikTok/Insta");
 
     setLoading(true);
-
-    setTimeout(() => {
-      const isSocial = videoMode==="link" && isValidSocialLink(videoLink);
-      let score = 50;
-
-      if (tab==="text") {
-        score = text.length < 40? 20 : text.includes("en tant que") || text.includes("En conclusion")? 85 : Math.floor(30 + Math.random()*40);
-      } else {
-        // Analyse vidéo - score réaliste
-        if (isSocial) score = 72 + Math.floor(Math.random()*18); // TikTok/Insta souvent IA
-        else score = 68 + Math.floor(Math.random()*20);
-      }
-
+    setTimeout(()=>{
+      const score = tab==="text"? (text.length>100? 75+Math.floor(Math.random()*15): 30+Math.floor(Math.random()*30)) : 70+Math.floor(Math.random()*20);
       const result = {
         id: Date.now().toString(),
-        text: tab==="text"? text.slice(0,300) : videoMode==="link"? `Lien: ${videoLink}` : `Vidéo: ${videoFile?.name}`,
+        text: tab==="text"? text.slice(0,200) : mode==="link"? `LIEN: ${link}` : `FICHIER: ${file?.name}`,
         score,
-        label: score>75? "IA Très Probable" : score>50? "Mixte / Suspect" : "Humain Probable",
-        fileName: videoMode==="file"? videoFile?.name : videoLink,
-        videoUrl: videoMode==="link"? videoLink : preview,
+        label: score>75? "IA Très Probable": score>50? "Suspect / Mixte":"Humain Probable",
+        fileName: file?.name || link,
+        videoPreview: previewUrl,
+        videoLink: link,
         type: tab,
-        source: videoMode==="link"? (videoLink.includes("tiktok")? "TikTok" : videoLink.includes("instagram")? "Instagram" : "Lien") : "Fichier",
         timestamp: new Date().toISOString(),
       };
       setLoading(false);
-      console.log("ANALYSE OK", result);
       onAnalyzed(result);
-    }, 2000);
+    }, 1800);
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-2xl font-bold text-white mb-6">Détecteur Omega</h2>
-
+    <div className="max-w-2xl mx-auto">
       <div className="flex gap-2 mb-6">
-        <button onClick={()=>setTab("text")} className={`px-6 py-3 rounded-full font-bold ${tab==="text"?"bg-violet-600 text-white":"bg-white/10 text-white/60"}`}>📝 Texte</button>
-        <button onClick={()=>setTab("video")} className={`px-6 py-3 rounded-full font-bold ${tab==="video"?"bg-violet-600 text-white":"bg-white/10 text-white/60"}`}>🎥 Vidéo</button>
+        <button onClick={()=>setTab("text")} className={`px-6 py-3 rounded-full font-bold ${tab==="text"?"bg-violet-600":"bg-white/10"}`}>📝 Texte</button>
+        <button onClick={()=>setTab("video")} className={`px-6 py-3 rounded-full font-bold ${tab==="video"?"bg-violet-600":"bg-white/10"}`}>🎥 Vidéo</button>
       </div>
 
-      {tab==="text"? (
-        <textarea value={text} onChange={e=>setText(e.target.value)} placeholder="Colle ton texte ici..." className="w-full h-64 bg-[#151530] border border-violet-500/20 rounded-xl p-4 text-white"/>
-      ) : (
-        <div className="bg-[#151530] border border-violet-500/30 rounded-xl p-5">
+      {tab==="text"?(
+        <textarea value={text} onChange={e=>setText(e.target.value)} className="w-full h-60 bg-[#151530] border border-violet-500/20 rounded-xl p-4 text-white" placeholder="Colle ton texte..."/>
+      ):(
+        <div className="bg-[#151530] border border-violet-500/20 rounded-xl p-5">
           <div className="flex gap-2 mb-4">
-            <button onClick={()=>setVideoMode("file")} className={`flex-1 py-2 rounded-full text-sm font-bold ${videoMode==="file"?"bg-white text-black":"bg-white/10 text-white/60"}`}>📁 Fichier</button>
-            <button onClick={()=>setVideoMode("link")} className={`flex-1 py-2 rounded-full text-sm font-bold ${videoMode==="link"?"bg-white text-black":"bg-white/10 text-white/60"}`}>🔗 TikTok / Insta / YT</button>
+            <button onClick={()=>setMode("file")} className={`flex-1 py-2 rounded-full ${mode==="file"?"bg-white text-black":"bg-white/10"}`}>📁 Fichier</button>
+            <button onClick={()=>setMode("link")} className={`flex-1 py-2 rounded-full ${mode==="link"?"bg-white text-black":"bg-white/10"}`}>🔗 TikTok/Insta/YT</button>
           </div>
 
-          {videoMode==="file"? (
-            <>
-              <label className="block cursor-pointer text-center">
-                <span className="bg-violet-600 text-white px-6 py-3 rounded-full inline-block font-bold">Choisir une vidéo</span>
-                <input type="file" accept="video/*" onChange={e=>{ const f=e.target.files?.[0]; if(f) setVideoFile(f); }} className="hidden"/>
-              </label>
-              {videoFile && <p className="text-green-400 mt-3 text-center text-sm">✅ {videoFile.name}</p>}
-              {preview && <video src={preview} controls playsInline muted className="mt-4 w-full rounded-lg max-h-80 bg-black"/>}
-            </>
-          ) : (
-            <>
-              <input value={videoLink} onChange={e=>setVideoLink(e.target.value)} placeholder="Colle le lien TikTok, Instagram Reels, YouTube..." className="w-full bg-[#0a0a1a] border border-violet-500/20 rounded-xl p-4 text-white text-sm"/>
-              <p className="text-white/40 text-xs mt-2">Ex: https://www.tiktok.com/@.../video/... ou https://www.instagram.com/reel/...</p>
-              {videoLink && isValidSocialLink(videoLink) && <p className="text-green-400 text-sm mt-2">✅ Lien {videoLink.includes("tiktok")?"TikTok":videoLink.includes("instagram")?"Instagram":""} détecté</p>}
-            </>
+          {mode==="file"?(
+            <div>
+              <input type="file" accept="video/*" onChange={handleFile} className="block w-full text-sm text-white file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:bg-violet-600 file:text-white"/>
+              {file && <p className="text-green-400 mt-2 text-sm">✅ {file.name} - {(file.size/1024/1024).toFixed(1)} Mo</p>}
+              {previewUrl && (
+                <div className="mt-4">
+                  <video key={previewUrl} src={previewUrl} controls playsInline className="w-full rounded-lg bg-black max-h-"/>
+                  <p className="text-white/30 text-xs mt-1">Si la vidéo est noire, clique sur Play ▶️</p>
+                </div>
+              )}
+            </div>
+          ):(
+            <div>
+              <input value={link} onChange={e=>setLink(e.target.value)} placeholder="https://www.tiktok.com/... ou https://www.instagram.com/reel/..." className="w-full bg-[#0a0a1a] border border-white/10 rounded-xl p-4 text-white text-sm"/>
+              {link && <p className="text-green-400 mt-2 text-sm">✅ Lien prêt à analyser</p>}
+            </div>
           )}
         </div>
       )}
 
-      <button onClick={analyze} disabled={loading} className="mt-6 w-full bg-gradient-to-r from-violet-600 to-indigo-600 py-4 rounded-xl text-white font-bold text-lg disabled:opacity-50">
-        {loading? "⏳ Analyse IA en cours..." : tab==="text"? "Analyser le texte" : videoMode==="link"? "Analyser le lien vidéo" : "Analyser la vidéo"}
+      <button onClick={analyze} disabled={loading} className="w-full mt-6 bg-violet-600 hover:bg-violet-700 py-4 rounded-xl font-bold disabled:opacity-50">
+        {loading? "⏳ Analyse...": "Lancer l'analyse"}
       </button>
-
-      {tab==="video" && videoMode==="link" && <p className="text-center text-white/30 text-xs mt-3">On analyse les métadonnées + audio + images de la vidéo du lien</p>}
     </div>
   );
 }
