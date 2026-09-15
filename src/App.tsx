@@ -1,50 +1,47 @@
-import { useState, useEffect } from "react";
-import LoginPage from "./components/LoginPage";
-import DashboardPage from "./components/DashboardPage";
-import ResultsPage from "./components/ResultsPage";
-import HumanizerPage from "./components/HumanizerPage";
+import { useState } from "react";
 
 export default function App(){
-  const [isAuth,setIsAuth]=useState(false);
-  const [page,setPage]=useState("dashboard");
+  const [text,setText]=useState("");
   const [result,setResult]=useState<any>(null);
-  const [history,setHistory]=useState<any[]>([]);
-  const [menu,setMenu]=useState(false);
+  const [loading,setLoading]=useState(false);
 
-  useEffect(()=>{
-    if(localStorage.getItem("detectai_current")) setIsAuth(true);
-    const h=localStorage.getItem("detectai_history");
-    if(h) try{setHistory(JSON.parse(h))}catch{}
-  },[]);
-
-  const handleAnalyzed=(r:any)=>{
-    console.log("RESULT RECU", r);
-    setResult(r);
-    const nh=[r,...history];
-    setHistory(nh);
-    localStorage.setItem("detectai_history", JSON.stringify(nh));
-    setPage("results");
-    window.scrollTo(0,0);
+  const run=()=>{
+    if(!text.trim()){alert("Ecris un texte"); return;}
+    setLoading(true);
+    setTimeout(()=>{
+      let score=40; const reasons:any[]=[];
+      if(/en tant que|il est important de noter|en conclusion|de plus,|dans le monde d'aujourd'hui/i.test(text)){score+=35; reasons.push({t:"Marqueur IA detecté", d:"Expression typique ChatGPT"});}
+      if(!/mdr|lol|wsh|bah/i.test(text)){score+=15; reasons.push({t:"Texte trop parfait", d:"Pas de langage oral humain"});}
+      if(text.split(/[.!?]+/).length>3){score+=10; reasons.push({t:"Rythme monotone", d:"Phrases de meme longueur - faible burstiness"});}
+      score=Math.max(10,Math.min(95,score+Math.floor(Math.random()*10)));
+      setResult({score, label:score>75?"IA Tres Probable":score>50?"Probablement IA":"Humain Probable", reasons, text});
+      setLoading(false);
+    },1000);
   };
 
-  if(!isAuth) return <LoginPage onLogin={()=>setIsAuth(true)}/>;
+  if(result){
+    return(
+      <div className="min-h-screen bg-[#0A0A0F] text-white p-6">
+        <div className="max-w-xl mx-auto bg-[#12121F] border border-white/10 rounded-2xl p-6 mt-10">
+          <button onClick={()=>setResult(null)} className="text-white/40 text-sm mb-4">← Retour</button>
+          <h2 className={`text-3xl font-black ${result.score>60?"text-red-400":"text-emerald-400"}`}>{result.label}</h2>
+          <p className="text-5xl font-black mt-2">{result.score}%</p>
+          <div className="w-full bg-white/10 h-2 rounded-full mt-4"><div className="h-full bg-red-400" style={{width:`${result.score}%`}}/></div>
+          <div className="mt-6 space-y-3">{result.reasons.map((r:any,i:number)=><div key={i} className="bg-[#0A0A0F] border border-white/5 rounded-xl p-3"><p className="font-bold text-sm">{r.t}</p><p className="text-xs text-white/60">{r.d}</p></div>)}</div>
+          <div className="mt-4 bg-black/50 p-3 rounded-xl text-xs text-white/40">{result.text.slice(0,300)}</div>
+        </div>
+      </div>
+    );
+  }
 
   return(
-    <div className="min-h-screen bg-[#0A0A0F] text-white flex">
-      <button onClick={()=>setMenu(!menu)} className="fixed top-4 left-4 z-50 lg:hidden bg-[#12121F] p-3 rounded-full border border-white/10">☰</button>
-      <div className={`fixed lg:static w-72 bg-[#12121F] border-r border-white/5 p-6 z-40 ${menu?"translate-x-0":"-translate-x-full"} lg:translate-x-0 transition`}>
-        <h1 className="font-black mb-8">DETECTAI OMEGA</h1>
-        <button onClick={()=>{setPage("dashboard"); setMenu(false)}} className={`w-full text-left px-4 py-3 rounded-full mb-2 ${page==="dashboard"?"bg-white text-black":"bg-white/5"}`}>Detecteur</button>
-        <button onClick={()=>{setPage("humanizer"); setMenu(false)}} className={`w-full text-left px-4 py-3 rounded-full mb-2 ${page==="humanizer"?"bg-white text-black":"bg-white/5"}`}>Humaniseur</button>
-        <button onClick={()=>{setPage("history"); setMenu(false)}} className={`w-full text-left px-4 py-3 rounded-full mb-2 ${page==="history"?"bg-white text-black":"bg-white/5"}`}>Historique ({history.length})</button>
-        <button onClick={()=>{localStorage.removeItem("detectai_current"); setIsAuth(false)}} className="w-full text-left px-4 py-3 rounded-full bg-red-500/10 text-red-300 mt-10">Quitter</button>
-      </div>
-      <div className="flex-1 p-4 lg:p-8 pt-16 lg:pt-8">
-        {page==="dashboard" && <DashboardPage onAnalyzed={handleAnalyzed}/>}
-        {page==="humanizer" && <HumanizerPage onAnalyzed={handleAnalyzed}/>}
-        {page==="results" && result && <ResultsPage result={result} onBack={()=>setPage("dashboard")}/>}
-        {page==="results" && !result && <div className="text-center mt-20"><p>Aucun resultat</p><button onClick={()=>setPage("dashboard")} className="mt-4 bg-white text-black px-6 py-2 rounded-full">Retour</button></div>}
-        {page==="history" && <div className="max-w-2xl mx-auto">{history.map((h:any,i)=><div key={i} onClick={()=>{setResult(h); setPage("results")}} className="bg-[#12121F] border border-white/5 p-4 rounded-xl mb-3 cursor-pointer"><p className="text-sm truncate">{h.fullText||h.text}</p><p className="text-xs text-white/40">{h.label} {h.score}%</p></div>)}</div>}
+    <div className="min-h-screen bg-[#0A0A0F] text-white p-6">
+      <div className="max-w-xl mx-auto mt-20">
+        <h1 className="text-3xl font-black text-center">DETECTAI TEST</h1>
+        <p className="text-center text-white/40 text-sm mt-2">Version test ultra simple</p>
+        <textarea value={text} onChange={e=>setText(e.target.value)} className="w-full h-40 bg-[#12121F] border border-white/10 rounded-xl p-4 mt-8 text-white outline-none" placeholder="Colle un texte ici..."/>
+        <button onClick={run} className="w-full mt-4 bg-white text-black py-4 rounded-full font-black">{loading?"Analyse...":"LANCER L'ANALYSE (TEST)"}</button>
+        <p className="text-center text-white/20 text- mt-4">Si ce bouton ne marche pas, c'est ton navigateur qui bloque</p>
       </div>
     </div>
   );
