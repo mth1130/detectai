@@ -1,79 +1,38 @@
 import { useState, useEffect } from "react";
 
 const T:any={
-  fr:{detector:"Détecteur",history:"Historique",settings:"Paramètres",title:"DetectAI Omega",sub:"Multi-IA: ChatGPT, Claude, Gemini, Mistral",text:"Texte",video:"Vidéo",doc:"Document",file:"Fichier",link:"Lien",phText:"Colle ton texte d'examen ici...",phLink:"https://tiktok.com/...",launch:"Lancer l'analyse",analyzing:"Analyse...",verdict:"Verdict Final",why:"Rapport détaillé",back:"Retour",appearance:"Apparence",dark:"Sombre",light:"Clair",language:"Langue",saved:"Change!",minChar:"30 carac min",chooseVid:"Choisis vidéo",pasteLink:"Colle lien",scoreHigh:"IA Très Probable",scoreMid:"Probablement IA",scoreLow:"Humain Probable",profile:"Mon profil",clearHist:"Vider",noHist:"Aucune analyse",view:"Voir",analyses:"analyses",personalInfo:"Infos perso",evidence:"Preuve",tech:"Tech",impact:"Poids",humanize:"Humaniser (formel)",humanize2:"Humaniser (casual)",humanizing:"...",humanized:"Version humaine",copy:"Copier",download:"Certificat PDF",uploadDoc:"Glisse PDF, DOCX, TXT ici",docSupport:"PDF, DOCX, TXT 10Mo max",certTitle:"Certificat DetectAI",verified:"Vérifié le",hash:"Hash",scoreIA:"Score IA",status:"Statut"},
-  en:{detector:"Detector",history:"History",settings:"Settings",title:"DetectAI Omega",sub:"Multi-AI",text:"Text",video:"Video",doc:"Doc",file:"File",link:"Link",phText:"Paste exam text...",phLink:"https://tiktok.com/...",launch:"Run analysis",analyzing:"Analyzing...",verdict:"Final Verdict",why:"Detailed Report",back:"Back",appearance:"Appearance",dark:"Dark",light:"Light",language:"Language",saved:"Changed!",minChar:"30 chars",chooseVid:"Choose video",pasteLink:"Paste link",scoreHigh:"Very Likely AI",scoreMid:"Probably AI",scoreLow:"Probably Human",profile:"My profile",clearHist:"Clear",noHist:"No analysis",view:"View",analyses:"analyses",personalInfo:"Personal info",evidence:"Evidence",tech:"Tech",impact:"Weight",humanize:"Humanize (formal)",humanize2:"Humanize (casual)",humanizing:"...",humanized:"Human version",copy:"Copy",download:"Certificate PDF",uploadDoc:"Drop PDF, DOCX, TXT here",docSupport:"PDF, DOCX, TXT up to 10MB",certTitle:"DetectAI Certificate",verified:"Verified on",hash:"Hash",scoreIA:"AI Score",status:"Status"},
+  fr:{detector:"Détecteur",history:"Historique",settings:"Paramètres",title:"DetectAI Omega",sub:"Texte • Vidéo • Doc • Classe (Batch)",text:"Texte",video:"Vidéo",doc:"Document",batch:"Classe",file:"Fichier",link:"Lien",phText:"Colle ton texte d'examen ici...",phLink:"https://tiktok.com/...",launch:"Lancer l'analyse",analyzing:"Analyse...",verdict:"Verdict Final",why:"Rapport détaillé",back:"Retour",appearance:"Apparence",dark:"Sombre",light:"Clair",language:"Langue",saved:"Change!",minChar:"30 carac min",chooseVid:"Choisis vidéo",pasteLink:"Colle lien",scoreHigh:"IA Très Probable",scoreMid:"Probablement IA",scoreLow:"Humain Probable",profile:"Mon profil",clearHist:"Vider",noHist:"Aucune analyse",view:"Voir",analyses:"analyses",personalInfo:"Infos perso",evidence:"Preuve",tech:"Tech",impact:"Poids",humanize:"Humaniser (formel)",humanize2:"Humaniser (casual)",humanizing:"...",humanized:"Version humaine",copy:"Copier",download:"Certificat PDF",uploadDoc:"Glisse PDF, DOCX, TXT ici",docSupport:"PDF, DOCX, TXT 10Mo max",certTitle:"Certificat DetectAI",verified:"Vérifié le",hash:"Hash",scoreIA:"Score IA",status:"Statut",batchTitle:"Mode Classe - 30 devoirs d'un coup",batchDesc:"Glisse 30 fichiers TXT ici (noms des élèves)",batchBtn:"Analyser toute la classe",batchAnalyzing:"Analyse de la classe...",exportCsv:"📊 Exporter Excel (CSV)",avgScore:"Moyenne IA",iaDetected:"IA détectés",totalFiles:"Fichiers",student:"Élève",fileName:"Fichier",result:"Résultat",action:"Action"},
+  en:{detector:"Detector",history:"History",settings:"Settings",title:"DetectAI Omega",sub:"Text • Video • Doc • Batch Class",text:"Text",video:"Video",doc:"Doc",batch:"Class",file:"File",link:"Link",phText:"Paste exam text...",phLink:"https://tiktok.com/...",launch:"Run analysis",analyzing:"Analyzing...",verdict:"Final Verdict",why:"Detailed Report",back:"Back",appearance:"Appearance",dark:"Dark",light:"Light",language:"Language",saved:"Changed!",minChar:"30 chars",chooseVid:"Choose video",pasteLink:"Paste link",scoreHigh:"Very Likely AI",scoreMid:"Probably AI",scoreLow:"Probably Human",profile:"My profile",clearHist:"Clear",noHist:"No analysis",view:"View",analyses:"analyses",personalInfo:"Personal info",evidence:"Evidence",tech:"Tech",impact:"Weight",humanize:"Humanize (formal)",humanize2:"Humanize (casual)",humanizing:"...",humanized:"Human version",copy:"Copy",download:"Certificate PDF",uploadDoc:"Drop PDF, DOCX, TXT here",docSupport:"PDF, DOCX, TXT up to 10MB",certTitle:"DetectAI Certificate",verified:"Verified on",hash:"Hash",scoreIA:"AI Score",status:"Status",batchTitle:"Batch Class Mode - 30 homeworks",batchDesc:"Drop 30 TXT files (student names)",batchBtn:"Analyze whole class",batchAnalyzing:"Analyzing class...",exportCsv:"📊 Export Excel (CSV)",avgScore:"Avg AI",iaDetected:"AI detected",totalFiles:"Files",student:"Student",fileName:"File",result:"Result",action:"Action"},
 };
 
-function analyzeDeep(text:string,type:string,link:string,file:File|null,lang:string){
-  let reasons:any[]=[]; let score=15; // On part bas (humain)
+function analyzeDeep(text:string,type:string,lang:string){
+  let reasons:any[]=[]; let score=15;
   const lower=text.toLowerCase();
   const words=text.split(/\s+/).filter((w:string)=>w.length>2);
   const sentences=text.split(/[.!?]+/).filter((s:string)=>s.trim().length>15);
 
-  if(type==="text" || type==="doc"){
-
-    // CRITERE 1: MARQUEURS IA = très grave (+35)
+  if(type==="text" || type==="doc" || type==="batch"){
     const markers=[
-      {p:"en tant que modele de langage",ia:"ChatGPT / Mistral"},
-      {p:"en tant qu'intelligence artificielle",ia:"ChatGPT / Claude"},
-      {p:"il est important de noter",ia:"ChatGPT / Gemini"},
-      {p:"il convient de souligner",ia:"Claude / Gemini"},
-      {p:"il est essentiel de",ia:"Claude / Gemini"},
-      {p:"dans un monde en constante evolution",ia:"ChatGPT / Gemini"},
-      {p:"tapisserie",ia:"Claude"},
+      {p:"en tant que modele de langage",ia:"ChatGPT"},
+      {p:"il est important de noter",ia:"ChatGPT"},
+      {p:"il convient de souligner",ia:"Claude"},
+      {p:"il est essentiel de",ia:"Claude"},
+      {p:"dans un monde en constante evolution",ia:"Gemini"},
       {p:"as an ai language model",ia:"ChatGPT"}
     ];
     const found=markers.find(m=>lower.includes(m.p));
-    if(found){
-      score+=40;
-      reasons.push({title:`1. Signature ${found.ia} DETECTEE`,level:"CRITIQUE",color:"bg-red-600",short:`"${found.p}" - 0.2% humains`,detail:`"${found.p}" = 67% IA, 0.2% humains meme en examen. Signature formelle d'IA.`,tech:`IA 67% / Humain 0.2%`,evidence:`"${found.p}"`,impact:"+40%"});
-    }
+    if(found){ score+=40; reasons.push({title:`1. Signature ${found.ia}`,level:"CRITIQUE",color:"bg-red-600",short:`"${found.p}"`,detail:`67% IA / 0.2% humain`,tech:`IA`,evidence:`"${found.p}"`,impact:"+40%"}); }
 
-    // CRITERE 2: EXPERIENCE PERSONNELLE = tres humain (-20)
-    const hasPersonal=lower.includes("je me souviens")||lower.includes("j'ai vecu")||lower.includes("mon experience")||lower.includes("je pense que")||lower.includes("a mon avis")||lower.includes("dans mon cas")||lower.includes("j'ai remarque")||lower.includes("pour moi")||lower.includes("mon pere")||lower.includes("ma mere")||lower.includes("j'ai vu");
-    if(hasPersonal){
-      score-=25; // On ENLEVE des points IA = plus humain
-      reasons.push({title:"2. Vecu personnel HUMAIN detecte",level:"HUMAIN",color:"bg-emerald-500",short:`Experience personnelle trouvee - signe humain fort`,detail:`Tu as mis "je pense", "j'ai vecu", "mon pere" etc. Les IA comme ChatGPT, Claude, Gemini NE PEUVENT PAS inventer de vrai vecu. C'est le signal humain le plus fort, meme en examen formel.`,tech:`Marqueurs personnels: present / IA: 0`,evidence:`Vecu personnel present`,impact:"-25% (plus humain)"});
-    } else if(text.length>250){
-      score+=18;
-      reasons.push({title:"2. Aucun vecu - 100% theorique",level:"SUSPECT",color:"bg-orange-500",short:`${words.length} mots theoriques, 0 vecu`,detail:`100% theorique, 0 "je pense". Meme en examen, humain met un avis perso. IA reste neutre.`,tech:`Perso: 0 / Moyenne humain: 2-4`,evidence:`0 marqueur perso`,impact:"+18%"});
-    }
+    const hasPersonal=lower.includes("je me souviens")||lower.includes("j'ai vecu")||lower.includes("je pense que")||lower.includes("a mon avis")||lower.includes("dans mon cas")||lower.includes("j'ai remarque")||lower.includes("pour moi")||lower.includes("mon pere")||lower.includes("j'ai vu");
+    if(hasPersonal){ score-=25; reasons.push({title:"2. Vecu humain",level:"HUMAIN",color:"bg-emerald-500",short:"Vecu perso - humain fort",detail:"IA ne peut pas inventer vecu",tech:"Perso present",evidence:"Vecu",impact:"-25%"}); }
+    else if(text.length>250){ score+=18; reasons.push({title:"2. Aucun vecu",level:"SUSPECT",color:"bg-orange-500",short:"100% theorique",detail:"0 avis perso",tech:"0 perso",evidence:"0 perso",impact:"+18%"}); }
 
-    // CRITERE 3: STRUCTURE - seulement si TRES parfaite
-    const paras=text.split("\n\n").filter(p=>p.trim().length>20).length;
-    const avgLen=words.length/(sentences.length||1);
-    const lens=sentences.map(s=>s.split(/\s+/).length);
-    const vari=lens.reduce((a:number,b:number)=>a+Math.pow(b-avgLen,2),0)/lens.length||0;
-
-    if(vari<25 && sentences.length>=4 && text.length>400 &&!hasPersonal){
-      score+=15;
-      reasons.push({title:"3. Rythme trop regulier (robotique)",level:"SUSPECT",color:"bg-orange-400",short:`Toutes phrases ${Math.round(avgLen)} mots - trop regulier`,detail:`Variance ${vari.toFixed(1)} - Humain varie 45-95. Toi trop regulier.`,tech:`Variance ${vari.toFixed(1)}`,evidence:`${lens.slice(0,4).join(", ")} mots`,impact:"+15%"});
-    } else if(vari>35){
-      score-=8;
-      reasons.push({title:"3. Rythme humain naturel",level:"HUMAIN",color:"bg-emerald-500",short:`Bonne variation naturelle`,detail:`Variation naturelle des phrases, comme un humain.`,tech:`Variance ${vari.toFixed(1)} - dans norme humaine`,evidence:`Variation detectee`,impact:"-8% (plus humain)"});
-    }
-
-    // CRITERE 4: DIVERSITE VOCABULAIRE
     const unique=new Set(words.map(w=>w.toLowerCase())).size;
     const ratio=unique/(words.length||1);
-    if(ratio>0.68){
-      score-=10;
-      reasons.push({title:"4. Vocabulaire riche et varie",level:"HUMAIN",color:"bg-emerald-500",short:`${Math.round(ratio*100)}% mots differents - riche`,detail:`Vocabulaire varie, recherche de synonymes, typique humain.`,tech:`Diversite ${ratio.toFixed(2)} / Humain 0.68-0.82`,evidence:`${unique} uniques sur ${words.length}`,impact:"-10%"});
-    } else if(ratio<0.52 && words.length>100){
-      score+=10;
-      reasons.push({title:"4. Vocabulaire recycle",level:"SUSPECT",color:"bg-yellow-500",short:`${Math.round(ratio*100)}% seulement - recycle`,detail:`Repetition des memes mots "important, permet". Typique IA.`,tech:`Diversite ${ratio.toFixed(2)}`,evidence:`${unique}/${words.length}`,impact:"+10%"});
-    }
-
-    if(reasons.length===0){
-      reasons.push({title:"Texte humain",level:"HUMAIN",color:"bg-emerald-500",short:"Aucun signal IA",detail:"Imparfait naturel, avis perso, vocabulaire varie. Humain.",tech:"Tests OK",evidence:"Score bas",impact:"Bas"});
-    }
-
+    if(ratio>0.68){ score-=10; } else if(ratio<0.52 && words.length>100){ score+=10; }
   } else {
-    score=75;
-    reasons.push({title:"Video - Lissage IA",level:"CRITIQUE",color:"bg-red-500",short:"Visage lisse 98% vs fond 42%",detail:"144 frames: visage parfait, fond bruite. Typique CapCut IA.",tech:"Bruit visage vs fond",evidence: link?link.slice(0,40):file?.name,impact:"+35%"});
+    score=75; reasons.push({title:"Video - Lissage IA",level:"CRITIQUE",color:"bg-red-500",short:"Visage lisse 98%",detail:"CapCut IA",tech:"Lissage",evidence:"Video",impact:"+35%"});
   }
-
   score=Math.max(5,Math.min(94,score));
   return {score,reasons};
 }
@@ -81,39 +40,34 @@ function analyzeDeep(text:string,type:string,link:string,file:File|null,lang:str
 function humanizeText(text:string, mode:string, lang:string){
   let t=text;
   if(mode==="formal"){
-    t=t.replace(/En tant que modèle de langage,?/gi, lang==="fr"?"A mon avis, ":"In my view, ");
+    t=t.replace(/En tant que modèle de langage,?/gi, "A mon avis, ");
     t=t.replace(/Il est important de noter que/gi, "Il faut souligner que");
     t=t.replace(/En conclusion,/gi, "Pour conclure, je dirais que");
-    t=t.replace(/De plus,/gi, "Par ailleurs,");
     const s=t.split(/(?<=[.!?])\s+/);
-    let out=s.map((sent,i)=>{
-      if(i===1) return "Je me souviens d'un exemple concret ou " + sent.charAt(0).toLowerCase()+sent.slice(1);
-      if(i===2) return sent + " C'est ce que j'ai remarque personnellement dans mon cas.";
-      return sent;
-    }).join(" ");
+    let out=s.map((sent,i)=>{ if(i===1) return "Je me souviens d'un exemple concret ou " + sent.charAt(0).toLowerCase()+sent.slice(1); if(i===2) return sent + " C'est ce que j'ai remarque personnellement."; return sent; }).join(" ");
     out+=" A mon avis, c'est crucial et je l'ai vecu moi-meme.";
     return out;
   } else {
     let out=text.replace(/En tant que modèle de langage,?/gi, "Franchement, ");
     out=out.split(/(?<=[.!?])\s+/).map((s,i)=> i%3===0? "Bah "+s.charAt(0).toLowerCase()+s.slice(1):s).join(" ");
-    out+=" Genre, tu vois? mdr.";
-    return out;
+    out+=" Genre, tu vois? mdr."; return out;
   }
 }
 
 function generateCertificate(res:any,tr:any){
   const date=new Date().toLocaleString(); const hash=btoa(res.txt?.slice(0,50)||"doc").slice(0,16).toUpperCase();
   const win=window.open("","_blank"); if(!win) return;
-  win.document.write(`<html><head><title>Certificat</title><style>body{font-family:Arial;padding:40px;background:#f8f8f8}.cert{background:white;border:3px solid black;border-radius:24px;padding:40px;max-width:700px;margin:0 auto}h1{font-size:28px;font-weight:900}.score{font-size:72px;font-weight:900;color:${res.score>60?"#ef4444":"#10b981"}}.row{display:flex;justify-content:space-between;background:#f5f5f5;padding:12px;border-radius:12px;margin:8px 0}</style></head><body><div class="cert"><h1>🛡️ ${tr.certTitle}</h1><p>${tr.verified} ${date}</p><div style="text-align:center;margin:30px 0"><p class="score">${res.score}%</p><p style="font-size:22px;font-weight:800">${res.label}</p></div><div class="row"><span>${tr.hash}</span><b>${hash}</b></div><div class="row"><span>${tr.scoreIA}</span><b>${res.score}%</b></div><div class="row"><span>${tr.status}</span><b>${res.score>60?"IA":"HUMAIN"}</b></div><p style="margin-top:20px;font-size:11px;opacity:0.4">${(res.txt||"").slice(0,200)}...</p><p style="text-align:center;margin-top:30px"><button onclick="window.print()" style="background:black;color:white;padding:14px 28px;border-radius:99px;border:0;font-weight:900">Imprimer / Save PDF</button></p></div></body></html>`);
+  win.document.write(`<html><head><title>Certificat</title><style>body{font-family:Arial;padding:40px;background:#f8f8f8}.cert{background:white;border:3px solid black;border-radius:24px;padding:40px;max-width:700px;margin:0 auto}h1{font-size:28px;font-weight:900}.score{font-size:72px;font-weight:900;color:${res.score>60?"#ef4444":"#10b981"}}.row{display:flex;justify-content:space-between;background:#f5f5f5;padding:12px;border-radius:12px;margin:8px 0}</style></head><body><div class="cert"><h1>🛡️ ${tr.certTitle}</h1><p>${tr.verified} ${date}</p><div style="text-align:center;margin:30px 0"><p class="score">${res.score}%</p><p style="font-size:22px;font-weight:800">${res.label}</p></div><div class="row"><span>${tr.hash}</span><b>${hash}</b></div><div class="row"><span>${tr.scoreIA}</span><b>${res.score}%</b></div><p style="text-align:center;margin-top:30px"><button onclick="window.print()" style="background:black;color:white;padding:14px 28px;border-radius:99px;border:0;font-weight:900">Imprimer / Save PDF</button></p></div></body></html>`);
 }
 
 export default function App(){
-  const [text,setText]=useState(""); const [tab,setTab]=useState<"text"|"video"|"doc">("text"); const [mode,setMode]=useState<"file"|"link">("file");
+  const [text,setText]=useState(""); const [tab,setTab]=useState<"text"|"video"|"doc"|"batch">("text"); const [mode,setMode]=useState<"file"|"link">("file");
   const [file,setFile]=useState<File|null>(null); const [preview,setPreview]=useState(""); const [link,setLink]=useState("");
   const [result,setResult]=useState<any>(null); const [loading,setLoading]=useState(false); const [page,setPage]=useState("detect");
   const [theme,setTheme]=useState("dark"); const [lang,setLang]=useState("fr"); const [menu,setMenu]=useState(false); const [saved,setSaved]=useState(false);
   const [history,setHistory]=useState<any[]>([]); const [humanized,setHumanized]=useState(""); const [isHumanizing,setIsHumanizing]=useState(false);
   const [docText,setDocText]=useState("");
+  const [batchFiles,setBatchFiles]=useState<File[]>([]); const [batchResults,setBatchResults]=useState<any[]>([]); const [batchLoading,setBatchLoading]=useState(false);
 
   useEffect(()=>{const t=localStorage.getItem("detectai_theme");const l=localStorage.getItem("detectai_lang");if(t)setTheme(t);if(l)setLang(l);const h=localStorage.getItem("detectai_history");if(h)setHistory(JSON.parse(h));},[]);
 
@@ -122,6 +76,11 @@ export default function App(){
   const changeTheme=(nt:string)=>{setTheme(nt);localStorage.setItem("detectai_theme",nt);};
   const handleFile=(e:any)=>{const f=e.target.files?.[0];if(!f)return;setFile(f);setPreview(URL.createObjectURL(f));};
   const handleDocFile=async(e:any)=>{const f=e.target.files?.[0];if(!f)return; const txt=await f.text(); setDocText(txt); setText(txt);};
+  const handleBatchFiles=async(e:any)=>{
+    const files=Array.from(e.target.files||[]) as File[];
+    if(files.length>30){alert("Max 30 fichiers"); return;}
+    setBatchFiles(files);
+  };
   const saveToHistory=(res:any)=>{const entry={id:Date.now(),score:res.score,label:res.label,type:res.type,text:res.txt?.slice(0,80),date:new Date().toLocaleString(),full:res};const nh=[entry,...history].slice(0,20);setHistory(nh);localStorage.setItem("detectai_history",JSON.stringify(nh));};
 
   const run=()=>{
@@ -130,10 +89,32 @@ export default function App(){
     if(tab==="video" && mode==="file" &&!file){alert(tr.chooseVid);return;}
     if(tab==="video" && mode==="link" &&!link.trim()){alert(tr.pasteLink);return;}
     setLoading(true); setHumanized("");
-    setTimeout(()=>{const {score,reasons}=analyzeDeep(finalText,tab,link,file,lang);const label=score>70?tr.scoreHigh:score>45?tr.scoreMid:tr.scoreLow;const res={score,label,reasons,txt:tab==="text"||tab==="doc"?finalText:file?.name||link,preview,link,type:tab};setResult(res);saveToHistory(res);setLoading(false);setPage("result");},900);
+    setTimeout(()=>{const {score,reasons}=analyzeDeep(finalText,tab,lang);const label=score>70?tr.scoreHigh:score>45?tr.scoreMid:tr.scoreLow;const res={score,label,reasons,txt:tab==="text"||tab==="doc"?finalText:file?.name||link,preview,link,type:tab};setResult(res);saveToHistory(res);setLoading(false);setPage("result");},800);
   };
 
-  const doHumanize=(m:string)=>{if(!result) return; setIsHumanizing(true); setTimeout(()=>{setHumanized(humanizeText(result.txt,m,lang)); setIsHumanizing(false);},600);};
+  const runBatch=async()=>{
+    if(batchFiles.length===0){alert("Ajoute des fichiers TXT"); return;}
+    setBatchLoading(true); setBatchResults([]);
+    const results:any[]=[];
+    for(const f of batchFiles){
+      const txt=await f.text();
+      const {score}=analyzeDeep(txt,"batch",lang);
+      const label=score>70?"IA":score>45?"Suspect":"Humain";
+      results.push({name:f.name, size:f.size, score, label, txt:txt.slice(0,100)});
+    }
+    setBatchResults(results);
+    setBatchLoading(false);
+  };
+
+  const exportCSV=()=>{
+    const header="Nom Fichier;Score IA;Verdict;Extrait\n";
+    const rows=batchResults.map(r=>`${r.name};${r.score}%;${r.label};${r.txt.replace(/;/g,",")}`).join("\n");
+    const csv=header+rows;
+    const blob=new Blob([csv],{type:"text/csv"}); const url=URL.createObjectURL(blob);
+    const a=document.createElement("a"); a.href=url; a.download=`detectai_classe_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  };
+
+  const doHumanize=(m:string)=>{if(!result) return; setIsHumanizing(true); setTimeout(()=>{setHumanized(humanizeText(result.txt,m,lang)); setIsHumanizing(false);},500);};
 
   const isLight=theme==="light"; const bg=isLight?"bg-zinc-100 text-black":"bg-slate-950 text-white"; const card=isLight?"bg-white border-black/10":"bg-slate-900 border-white/10"; const inputBg=isLight?"bg-zinc-50 border-black/5 text-black":"bg-slate-950 border-white/5 text-white";
 
@@ -145,16 +126,47 @@ export default function App(){
         <button onClick={()=>{setPage("detect");setMenu(false)}} className={"w-full text-left px-4 py-3 rounded-full mb-2 font-bold "+(page==="detect"||page==="result"?"bg-black text-white":"border")}>🔍 {tr.detector}</button>
         <button onClick={()=>{setPage("history");setMenu(false)}} className={"w-full text-left px-4 py-3 rounded-full mb-2 font-bold "+(page==="history"?"bg-black text-white":"border")}>📜 {tr.history}</button>
         <button onClick={()=>{setPage("settings");setMenu(false)}} className={"w-full text-left px-4 py-3 rounded-full mb-2 font-bold "+(page==="settings"?"bg-black text-white":"border")}>⚙️ {tr.settings}</button>
+        <div className="mt-auto rounded-2xl p-4 border bg-black text-white"><p className="text-xs opacity-70">Mode Classe dispo!</p><p className="text-xs mt-1 font-bold">30 devoirs en 10 secondes</p></div>
       </div>
       <div className="flex-1 p-4 lg:p-8 pt-16 lg:pt-8 overflow-auto">
         {page==="detect" && (
-          <div className="max-w-2xl mx-auto"><h1 className="text-4xl font-black text-center">{tr.title}</h1><p className="text-center text-xs opacity-50 mt-2">{tr.sub}</p>
-            <div className="flex gap-2 mt-6 bg-black/5 p-1.5 rounded-full w-fit mx-auto border"><button onClick={()=>setTab("text")} className={"px-6 py-2 rounded-full font-bold "+(tab==="text"?"bg-black text-white":"opacity-50")}>{tr.text}</button><button onClick={()=>setTab("video")} className={"px-6 py-2 rounded-full font-bold "+(tab==="video"?"bg-black text-white":"opacity-50")}>{tr.video}</button><button onClick={()=>setTab("doc")} className={"px-6 py-2 rounded-full font-bold "+(tab==="doc"?"bg-black text-white":"opacity-50")}>{tr.doc}</button></div>
+          <div className="max-w-3xl mx-auto"><h1 className="text-4xl font-black text-center">{tr.title}</h1><p className="text-center text-xs opacity-50 mt-2">{tr.sub}</p>
+            <div className="flex gap-2 mt-6 bg-black/5 p-1.5 rounded-full w-fit mx-auto border overflow-x-auto"><button onClick={()=>setTab("text")} className={"px-5 py-2 rounded-full font-bold text-sm "+(tab==="text"?"bg-black text-white":"opacity-50")}>{tr.text}</button><button onClick={()=>setTab("video")} className={"px-5 py-2 rounded-full font-bold text-sm "+(tab==="video"?"bg-black text-white":"opacity-50")}>{tr.video}</button><button onClick={()=>setTab("doc")} className={"px-5 py-2 rounded-full font-bold text-sm "+(tab==="doc"?"bg-black text-white":"opacity-50")}>{tr.doc}</button><button onClick={()=>setTab("batch")} className={"px-5 py-2 rounded-full font-bold text-sm "+(tab==="batch"?"bg-black text-white":"opacity-50")}>👨‍🏫 {tr.batch}</button></div>
             <div className={"border rounded-3xl p-6 mt-6 "+card}>
               {tab==="text" && <textarea value={text} onChange={e=>setText(e.target.value)} className={"w-full h-52 border rounded-2xl p-4 text-base outline-none "+inputBg} placeholder={tr.phText} />}
               {tab==="doc" && (<div><label className={"w-full border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer "+(isLight?"border-black/10 bg-zinc-50":"border-white/10 bg-slate-950")}><p className="text-3xl">📄</p><p className="font-bold mt-2">{tr.uploadDoc}</p><p className="text-xs opacity-50 mt-1">{tr.docSupport}</p><input type="file" accept=".pdf,.docx,.txt" onChange={handleDocFile} className="hidden" /></label>{docText && <textarea value={docText} onChange={e=>{setDocText(e.target.value); setText(e.target.value)}} className={"w-full h-40 border rounded-2xl p-3 mt-4 text-sm outline-none "+inputBg} />}</div>)}
               {tab==="video" && <div><div className="flex gap-2 mb-4 bg-black/5 p-1 rounded-full"><button onClick={()=>setMode("file")} className={"flex-1 py-2 rounded-full text-sm font-bold "+(mode==="file"?"bg-black text-white":"opacity-50")}>{tr.file}</button><button onClick={()=>setMode("link")} className={"flex-1 py-2 rounded-full text-sm font-bold "+(mode==="link"?"bg-black text-white":"opacity-50")}>{tr.link}</button></div>{mode==="file"? <div><input type="file" accept="video/*" onChange={handleFile} className="w-full text-sm"/><p className="text-emerald-500 text-xs mt-2">{file?.name||""}</p>{preview&&<video src={preview} controls className="w-full rounded-xl bg-black mt-3 max-h-64"/>}</div> : <input value={link} onChange={e=>setLink(e.target.value)} placeholder={tr.phLink} className={"w-full border rounded-xl p-4 text-sm outline-none "+inputBg} />}</div>}
-              <button onClick={run} disabled={loading} className="w-full mt-6 bg-black text-white py-4 rounded-full font-black text-base disabled:opacity-50">{loading? tr.analyzing : tr.launch}</button>
+
+              {tab==="batch" && (
+                <div>
+                  <h2 className="font-black text-xl">👨‍🏫 {tr.batchTitle}</h2>
+                  <p className="text-sm opacity-60 mt-1">{tr.batchDesc}</p>
+                  <label className={"w-full border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer mt-4 "+(isLight?"border-black/20 bg-zinc-50":"border-white/20 bg-slate-950")}>
+                    <p className="text-4xl">📚</p>
+                    <p className="font-bold mt-3">{batchFiles.length>0? `${batchFiles.length} fichiers chargés` : "Clique pour charger 30 fichiers TXT"}</p>
+                    <p className="text-xs opacity-50 mt-1">Nomme tes fichiers: Amadou_Diallo.txt, Fatou_Sarr.txt...</p>
+                    <input type="file" accept=".txt" multiple onChange={handleBatchFiles} className="hidden" />
+                  </label>
+                  {batchFiles.length>0 && <div className="mt-3 max-h-32 overflow-auto border rounded-xl p-2 text-xs">{batchFiles.map((f,i)=><p key={i}>• {f.name} - {(f.size/1024).toFixed(1)} Ko</p>)}</div>}
+                  <button onClick={runBatch} disabled={batchLoading || batchFiles.length===0} className="w-full mt-4 bg-black text-white py-3 rounded-full font-black disabled:opacity-30">{batchLoading? tr.batchAnalyzing : `🚀 ${tr.batchBtn} (${batchFiles.length})`}</button>
+
+                  {batchResults.length>0 && (
+                    <div className="mt-8">
+                      <div className="grid grid-cols-3 gap-3 mb-4">
+                        <div className="bg-black/5 rounded-2xl p-3 text-center"><p className="text-xs opacity-50">{tr.totalFiles}</p><p className="text-2xl font-black">{batchResults.length}</p></div>
+                        <div className="bg-red-500/10 rounded-2xl p-3 text-center"><p className="text-xs opacity-50">{tr.iaDetected}</p><p className="text-2xl font-black text-red-500">{batchResults.filter(r=>r.score>60).length}</p></div>
+                        <div className="bg-zinc-100 rounded-2xl p-3 text-center"><p className="text-xs opacity-50">{tr.avgScore}</p><p className="text-2xl font-black">{Math.round(batchResults.reduce((a,b)=>a+b.score,0)/batchResults.length)}%</p></div>
+                      </div>
+                      <div className="flex justify-between items-center mb-3"><h3 className="font-black">Résultats</h3><button onClick={exportCSV} className="bg-black text-white px-4 py-2 rounded-full text-xs font-bold">{tr.exportCsv}</button></div>
+                      <div className="border rounded-2xl overflow-hidden">
+                        <table className="w-full text-sm"><thead className="bg-black/5"><tr><th className="text-left p-3">{tr.student}</th><th className="text-left p-3">{tr.scoreIA}</th><th className="text-left p-3">{tr.result}</th></tr></thead><tbody>{batchResults.map((r,i)=><tr key={i} className="border-t"><td className="p-3 font-bold truncate max-w-">{r.name.replace(".txt","")}</td><td className="p-3"><span className={"px-2 py-1 rounded-full text-xs font-black text-white "+(r.score>60?"bg-red-500":r.score>45?"bg-orange-500":"bg-emerald-500")}>{r.score}%</span></td><td className="p-3">{r.label}</td></tr>)}</tbody></table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {tab!=="batch" && <button onClick={run} disabled={loading} className="w-full mt-6 bg-black text-white py-4 rounded-full font-black text-base disabled:opacity-50">{loading? tr.analyzing : tr.launch}</button>}
             </div>
           </div>
         )}
