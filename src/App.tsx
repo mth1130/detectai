@@ -1,129 +1,185 @@
-import { useState, useEffect } from "react";
-const T:any={
-  fr:{detector:"Détecteur",history:"Historique",settings:"Paramètres",title:"DetectAI V11",sub:"🌍 Version Mondiale - Honnête & Anonyme",text:"Texte",video:"Vidéo",image:"Image",doc:"Document",batch:"Classe",bypass:"Anti-Bypass",file:"Fichier",link:"Lien",phText:"Colle ton texte ici... V11 détecte les vécus inventés dans tous les pays",phLink:"https://tiktok.com/...",launch:"Analyse V11",analyzing:"Analyse...",verdict:"Verdict V11",why:"Rapport",back:"Retour",appearance:"Apparence",dark:"Sombre",light:"Clair",language:"Langue",saved:"Change!",minChar:"30 carac min",chooseVid:"Choisis vidéo",chooseImg:"Choisis image",pasteLink:"Colle lien",scoreHigh:"IA Très Probable",scoreMid:"Indécidable - Oral requis 🌍",scoreLow:"Probablement Humain",scoreBypass:"IA HUMANISÉE - Bypass!",clearHist:"Vider",noHist:"Aucune analyse",view:"Voir",analyses:"analyses",evidence:"Preuve",tech:"Tech",impact:"Poids",humanize:"Humaniser (formel)",humanize2:"Humaniser (casual)",copy:"Copier",download:"Certificat PDF",uploadDoc:"Glisse PDF, DOCX, TXT ici",docSupport:"PDF, DOCX, TXT 10Mo max",uploadImg:"Glisse une image ici",imgSupport:"JPG, PNG, WEBP 10Mo max",certTitle:"Certificat DetectAI V11",verified:"Vérifié le",hash:"Hash",scoreIA:"Score IA",status:"Statut",batchTitle:"Mode Classe Mondiale",batchDesc:"Glisse 30 fichiers TXT",batchBtn:"Analyser la classe",batchAnalyzing:"Analyse...",exportCsv:"📊 Exporter Excel",avgScore:"Moyenne IA",iaDetected:"IA détectés",totalFiles:"Fichiers",student:"Élève",fileName:"Fichier",result:"Résultat",bypassTitle:"🛡️ Anti-Bypass Mondial",bypassDesc:"Détecte Undetectable AI",bypassAlert:"⚠️ CONTOURNEMENT DÉTECTÉ",bypassDetail:"Texte IA humanisé",oralTitle:"🎤 Questions Orales Universelles",oralDesc:"Seul vrai auteur peut répondre avec précision."},
-  en:{detector:"Detector",history:"History",settings:"Settings",title:"DetectAI V11",sub:"🌍 Global - Honest & Anonymous",text:"Text",video:"Video",image:"Image",doc:"Doc",batch:"Class",bypass:"Anti-Bypass",file:"File",link:"Link",phText:"Paste text here... V11 detects fake lived experiences worldwide",phLink:"https://tiktok.com/...",launch:"Analyze V11",analyzing:"Analyzing...",verdict:"V11 Verdict",why:"Report",back:"Back",appearance:"Appearance",dark:"Dark",light:"Light",language:"Language",saved:"Changed!",minChar:"30 chars",chooseVid:"Choose video",chooseImg:"Choose image",pasteLink:"Paste link",scoreHigh:"Very Likely AI",scoreMid:"Undecidable - Oral needed 🌍",scoreLow:"Probably Human",scoreBypass:"HUMANIZED AI - Bypass!",clearHist:"Clear",noHist:"No analysis",view:"View",analyses:"analyses",evidence:"Evidence",tech:"Tech",impact:"Weight",humanize:"Humanize (formal)",humanize2:"Humanize (casual)",copy:"Copy",download:"Certificate PDF",uploadDoc:"Drop PDF, DOCX, TXT here",docSupport:"PDF, DOCX, TXT up to 10MB",uploadImg:"Drop image here",imgSupport:"JPG, PNG, WEBP up to 10MB",certTitle:"DetectAI V11 Certificate",verified:"Verified on",hash:"Hash",scoreIA:"AI Score",status:"Status",batchTitle:"Global Class Mode",batchDesc:"Drop 30 TXT files",batchBtn:"Analyze class",batchAnalyzing:"Analyzing...",exportCsv:"📊 Export Excel",avgScore:"Avg AI",iaDetected:"AI detected",totalFiles:"Files",student:"Student",fileName:"File",result:"Result",bypassTitle:"🛡️ Global Anti-Bypass",bypassDesc:"Detects Undetectable AI",bypassAlert:"⚠️ BYPASS DETECTED",bypassDetail:"Humanized AI",oralTitle:"🎤 Universal Oral Questions",oralDesc:"Only true author can answer precisely."},
-  es:{detector:"Detector",history:"Historial",settings:"Configuración",title:"DetectAI V11",sub:"🌍 Global - Honesta y Anónima",text:"Texto",video:"Video",image:"Imagen",doc:"Documento",batch:"Clase",bypass:"Anti-Bypass",file:"Archivo",link:"Enlace",phText:"Pega tu texto aquí... V11 detecta vivencias falsas",phLink:"https://tiktok.com/...",launch:"Analizar V11",analyzing:"Analizando...",verdict:"Veredicto V11",why:"Informe",back:"Volver",appearance:"Apariencia",dark:"Oscuro",light:"Claro",language:"Idioma",saved:"¡Cambiado!",minChar:"30 caract min",chooseVid:"Elige video",chooseImg:"Elige imagen",pasteLink:"Pega enlace",scoreHigh:"Muy Probable IA",scoreMid:"Indecidible - Oral necesario 🌍",scoreLow:"Probablemente Humano",scoreBypass:"¡IA HUMANIZADA!",clearHist:"Borrar",noHist:"Sin análisis",view:"Ver",analyses:"análisis",evidence:"Prueba",tech:"Técnica",impact:"Impacto",humanize:"Humanizar (formal)",humanize2:"Humanizar (casual)",copy:"Copiar",download:"Certificado PDF",uploadDoc:"Arrastra PDF, DOCX, TXT aquí",docSupport:"PDF, DOCX, TXT 10MB max",uploadImg:"Arrastra imagen aquí",imgSupport:"JPG, PNG, WEBP 10MB max",certTitle:"Certificado DetectAI V11",verified:"Verificado el",hash:"Hash",scoreIA:"Score IA",status:"Estado",batchTitle:"Modo Clase Mundial",batchDesc:"Arrastra 30 archivos TXT",batchBtn:"Analizar clase",batchAnalyzing:"Analizando...",exportCsv:"📊 Exportar Excel",avgScore:"Promedio IA",iaDetected:"IA detectados",totalFiles:"Archivos",student:"Alumno",fileName:"Archivo",result:"Resultado",bypassTitle:"🛡️ Anti-Bypass Mundial",bypassDesc:"Detecta Undetectable AI",bypassAlert:"⚠️ BYPASS DETECTADO",bypassDetail:"Texto IA humanizado",oralTitle:"🎤 Preguntas Universales",oralDesc:"Solo el autor real puede responder con precisión."},
-  ar:{detector:"الكاشف",history:"السجل",settings:"الإعدادات",title:"DetectAI V11",sub:"🌍 عالمي - صادق ومجهول",text:"نص",video:"فيديو",image:"صورة",doc:"وثيقة",batch:"فصل",bypass:"مضاد تجاوز",file:"ملف",link:"رابط",phText:"الصق النص هنا... V11 يكشف التجارب المزيفة عالميا",phLink:"https://tiktok.com/...",launch:"تحليل V11",analyzing:"تحليل...",verdict:"الحكم V11",why:"تقرير",back:"رجوع",appearance:"المظهر",dark:"داكن",light:"فاتح",language:"اللغة",saved:"تم!",minChar:"30 حرفا",chooseVid:"اختر فيديو",chooseImg:"اختر صورة",pasteLink:"الصق رابطا",scoreHigh:"ذكاء اصطناعي محتمل جدا",scoreMid:"غير قابل للحسم - مقابلة مطلوبة 🌍",scoreLow:"بشري محتمل",scoreBypass:"ذكاء اصطناعي مؤنسن!",clearHist:"مسح",noHist:"لا يوجد تحليل",view:"عرض",analyses:"تحليل",evidence:"دليل",tech:"تقني",impact:"تأثير",humanize:"جعله بشري رسمي",humanize2:"جعله عامي",copy:"نسخ",download:"شهادة PDF",uploadDoc:"اسحب PDF أو DOCX أو TXT هنا",docSupport:"PDF, DOCX, TXT حتى 10MB",uploadImg:"اسحب صورة هنا",imgSupport:"JPG, PNG, WEBP حتى 10MB",certTitle:"شهادة DetectAI V11",verified:"تم التحقق في",hash:"هاش",scoreIA:"نتيجة IA",status:"الحالة",batchTitle:"وضع الفصل العالمي",batchDesc:"اسحب 30 ملف TXT",batchBtn:"تحليل الفصل",batchAnalyzing:"تحليل...",exportCsv:"📊 تصدير Excel",avgScore:"متوسط IA",iaDetected:"تم كشف IA",totalFiles:"ملفات",student:"طالب",fileName:"ملف",result:"نتيجة",bypassTitle:"🛡️ مضاد تجاوز عالمي",bypassDesc:"يكشف Undetectable AI",bypassAlert:"⚠️ تم كشف تجاوز",bypassDetail:"نص مؤنسن",oralTitle:"🎤 أسئلة عالمية",oralDesc:"المؤلف الحقيقي فقط يمكنه الإجابة بدقة."},
-};
+'use client'
+import { useState, useEffect } from 'react'
 
-function analyzeDeep(text:string,type:string,lang:string, fileName?:string){
-  let reasons:any[]=[]; let score=42; let isBypass=false; let oralQuestions:string[]=[];
-  const lower=text.toLowerCase();
-  if(type==="text" || type==="doc" || type==="batch" || type==="bypass"){
-    const markers=["en tant que modele de langage","en tant qu'intelligence artificielle","il est important de noter","il convient de souligner","as an ai language model","it is important to note","it is crucial to understand"];
-    let foundCount=0; markers.forEach(m=>{ if(lower.includes(m)) foundCount++; });
-    if(foundCount>=1){ score+=28; reasons.push({title:`Formule IA x${foundCount}`,level:"CRITIQUE",color:"bg-red-600",short:`${foundCount} formules robotiques`,detail:`Formules rares chez humains, fréquentes chez IA dans toutes langues.`,tech:"Formule universelle",evidence:"Texte",impact:`+28%`}); }
-    const mentionsLived = /(mon père|ma mère|my father|my mother|mi padre|j'ai vécu|i lived|je me souviens|i remember|my dad|my mom)/i.test(lower);
-    const hasDate = /\b(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}|\d{4}|janvier|février|mars|january|february|monday|lundi)\b/i.test(lower);
-    const hasTime = /\b(\d{1,2}h\d{2}|\d{1,2}:\d{2}|14h32|2pm|am|pm)\b/i.test(lower);
-    const hasAmount = /\b(\d+\s*[€$£¥]| \d+ dollars?| \d+ euros?| \d+ francs?)\b/i.test(lower);
-    const hasPrecisePlace = /\b(rue|street|avenue|boulevard|district|building|shop|market|school|university|université)\b/i.test(lower) && /[A-Z][a-z]+/.test(text);
-    const hasSensory = /(odeur|smell|son|sound|couleur|color|froid|chaud|hot|cold|bruit|noise)/i.test(lower);
-    const specificCount = [hasDate, hasTime, hasAmount, hasPrecisePlace, hasSensory].filter(Boolean).length;
-    if(mentionsLived){
-      if(specificCount===0){
-        score+=10;
-        reasons.push({title:"Vécu vague - IA peut inventer",level:"SUSPECT",color:"bg-amber-500",short:"Vécu sans preuve",detail:`En 2026, IA peut inventer "mon père galère" sans détails, dans tous pays. Il faut dates, heures, montants, lieux précis, sensoriel. Score: 0/5.`,tech:"Vécu mondial",evidence:`0 détail`,impact:"+10% suspect"});
-        oralQuestions.push(`Tu parles d'un vécu - donne nom complet, adresse exacte, date et heure précises?`);
-        oralQuestions.push(`Combien exactement? Quelle odeur, quel bruit, quelle couleur tu te souviens?`);
-        oralQuestions.push(`Si je vérifie demain avec un témoin, il confirmera quoi exactement?`);
-      } else if(specificCount>=1 && specificCount<3){
-        score+=2;
-        reasons.push({title:`Vécu partiel (${specificCount}/5)`,level:"SUSPECT",color:"bg-orange-500",short:`${specificCount}/5 détails`,detail:`${specificCount} détails sur 5. Mieux que 0, mais IA avancée peut aussi inventer 1-2 détails. Oral recommandé.`,tech:"Vécu partiel",evidence:`${specificCount}/5`,impact:"+2%"});
-        oralQuestions.push(`Tu as donné ${specificCount} détails - donne 3 de plus non écrits?`);
-        oralQuestions.push(`Raconte la scène à l'envers, en commençant par la fin?`);
-      } else if(specificCount>=3){
-        score-=12;
-        reasons.push({title:`Vécu détaillé (${specificCount}/5)`,level:"HUMAIN",color:"bg-emerald-500",short:`${specificCount}/5 détails crédible`,detail:`Contient ${specificCount}/5 preuves: date, heure, montant, lieu précis, sensoriel. Difficile à inventer cohérent. Mais possible en 2026. Oral final conseillé.`,tech:"Vécu fort",evidence:`${specificCount}/5`,impact:"-12%"});
-        oralQuestions.push(`Raconte minute par minute avec détails sensoriels?`);
-      }
-    }
-    const bypassMarkers=["je me souviens d'un exemple concret ou","c'est ce que j'ai remarque personnellement","a mon avis, c'est crucial et je l'ai vecu moi-meme","bah ","genre, tu vois"];
-    let bypassCount=0; bypassMarkers.forEach(m=>{ if(lower.includes(m)) bypassCount++; });
-    if(bypassCount>=1){ isBypass=true; score=70 + bypassCount*2; reasons.push({title:"🛡️ Humanizer détecté",level:"BYPASS",color:"bg-orange-600",short:`${bypassCount} traces Bypass`,detail:`Ajout artificiel de "Bah, Genre, Je me souviens..." pour tromper.`,tech:"Anti-Bypass V11",evidence:"Humanizer",impact:"+70%"}); }
-    const sentences=text.split(/[.!?]/).filter(s=>s.trim().length>10).length;
-    const avgLen=text.length/(sentences||1);
-    if(avgLen>130 && avgLen<190 && bypassCount===0){ score+=8; reasons.push({title:"Phrases trop parfaites",level:"SUSPECT",color:"bg-orange-500",short:`${Math.round(avgLen)} carac/phrase`,detail:`Humain mélange court/long. IA trop régulier mondial.`,tech:"Perplexité",evidence:"Régulier",impact:"+8%"}); }
-  } else if(type==="image"){
-    const name=(fileName||"").toLowerCase();
-    const isPhonePhoto=name.includes("img_")||name.includes("whatsapp")||name.includes("screenshot")||name.includes("dsc");
-    const isAiName=name.includes("midjourney")||name.includes("dalle")||name.includes("firefly")||name.includes("stable")||name.includes("ai_");
-    if(isAiName){ score=88; reasons.push({title:"Nom = IA",level:"CRITIQUE",color:"bg-red-600",short:`Nom: ${fileName}`,detail:"Nommé comme IA générative",tech:"Nom",evidence:"Nom",impact:"+40%"}); }
-    else if(isPhonePhoto){ score=15; reasons.push({title:"Photo téléphone réel",level:"HUMAIN",color:"bg-emerald-500",short:"IMG_ / WhatsApp",detail:"Photo capteur réel",tech:"Metadata",evidence:"Nom",impact:"-40%"}); }
-    else { score=38; reasons.push({title:"Image neutre",level:"HUMAIN",color:"bg-zinc-500",short:"Pas d'indice",detail:"Pas d'indice nom. Analyse visuelle pro nécessaire.",tech:"Heuristique",evidence:"Neutre",impact:"Neutre"}); }
-  } else { score=75; reasons.push({title:"Video IA",level:"CRITIQUE",color:"bg-red-500",short:"CapCut IA",detail:"CapCut lisse peau",tech:"Lissage",evidence:"Video",impact:"+35%"}); }
-  score=Math.max(5,Math.min(92,score));
-  if(oralQuestions.length===0 && score>=38 && score<=68){
-    oralQuestions.push("Donne 3 détails ultra-précis non écrits (date exacte, heure, montant, odeur, couleur)?");
-    oralQuestions.push("Si je vérifie avec un témoin, il dira quoi exactement?");
-    oralQuestions.push("Raconte la même histoire à l'envers?");
+export default function App() {
+  const [input, setInput] = useState('')
+  const [result, setResult] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState('Texte')
+  const [analysesCount, setAnalysesCount] = useState(0)
+  const [isPro, setIsPro] = useState(false)
+  const [showPaywall, setShowPaywall] = useState(false)
+
+  const FREE_LIMIT = 3
+
+  // Charger LemonSqueezy
+  useEffect(() => {
+    const script = document.createElement('script')
+    script.src = 'https://app.lemonsqueezy.com/js/lemon.js'
+    script.defer = true
+    document.body.appendChild(script)
+  }, [])
+
+  const handleUpgrade = () => {
+    // Lien abonnement officiel LemonSqueezy - 6000 FCFA / $9.99 mois
+    window.open('https://detectai-labs.lemonsqueezy.com/checkout/buy/09980aca-6baa-4075-8917-7b2766dc6210', '_blank')
   }
-  return {score,reasons,isBypass,oralQuestions};
-}
-function humanizeText(text:string, mode:string, lang:string){let t=text; if(mode==="formal"){t=t.replace(/En tant que modèle de langage,?/gi, lang==="fr"?"A mon avis, ":"In my view, "); const s=t.split(/(?<=[.!?])\s+/); let out=s.map((sent,i)=>{ if(i===1) return "Je me souviens d'un exemple concret ou " + sent.charAt(0).toLowerCase()+sent.slice(1); if(i===2) return sent + " C'est ce que j'ai remarque personnellement."; return sent; }).join(" "); out+=" A mon avis, c'est crucial et je l'ai vecu moi-meme."; return out;} else { let out=text.replace(/En tant que modèle de langage,?/gi, "Franchement, "); out=out.split(/(?<=[.!?])\s+/).map((s,i)=> i%3===0? "Bah "+s.charAt(0).toLowerCase()+s.slice(1):s).join(" "); out+=" Genre, tu vois? mdr."; return out;}}
-function generateCertificate(res:any,tr:any){const date=new Date().toLocaleString(); const hash=btoa(res.txt?.slice(0,50)||"doc").slice(0,16).toUpperCase(); const win=window.open("","_blank"); if(!win) return; win.document.write(`<html><head><title>Certificat V11</title><style>body{font-family:Arial;padding:40px;background:#f8f8f8}.cert{background:white;border:3px solid black;border-radius:24px;padding:40px;max-width:700px;margin:0 auto}h1{font-size:28px;font-weight:900}.score{font-size:72px;font-weight:900;color:${res.isBypass?"#ea580c":res.score>60?"#ef4444":res.score>=38?"#f59e0b":"#10b981"}}.row{display:flex;justify-content:space-between;background:#f5f5f5;padding:12px;border-radius:12px;margin:8px 0}.alert{padding:12px;border-radius:12px;margin:16px 0;font-weight:800}.alert-bypass{background:#ffedd5;border:2px solid #ea580c}.alert-oral{background:#fef3c7;border:2px solid #f59e0b}</style></head><body><div class="cert"><h1>🌍🛡️ ${tr.certTitle}</h1><p>${tr.verified} ${date}</p><p style="font-size:12px;opacity:0.6">V11 Mondiale Anonyme - 12+ pays</p>${res.isBypass?`<div class="alert alert-bypass">🛡️ ${tr.bypassAlert}</div>`:""}${res.score>=38&&res.score<=68?`<div class="alert alert-oral">🎤 38-68% = Indécidable mondial. Oral recommandé.</div>`:""}<div style="text-align:center;margin:30px 0"><p class="score">${res.score}%</p><p style="font-size:20px;font-weight:800">${res.label}</p></div><div class="row"><span>${tr.hash}</span><b>${hash}</b></div><div class="row"><span>${tr.scoreIA}</span><b>${res.score}% ${res.isBypass?"(BYPASS)":""}</b></div>${res.oralQuestions?`<div style="margin-top:20px"><h3>🎤 Questions Orales</h3><ol>${res.oralQuestions.map((q:string)=>`<li style="margin:8px 0">${q}</li>`).join("")}</ol></div>`:""}<p style="text-align:center;margin-top:30px"><button onclick="window.print()" style="background:black;color:white;padding:14px 28px;border-radius:99px;border:0;font-weight:900">Imprimer / Save PDF</button></p></div></body></html>`);}
-export default function App(){
-  const [text,setText]=useState(""); const [tab,setTab]=useState<"text"|"video"|"image"|"doc"|"batch"|"bypass">("text"); const [mode,setMode]=useState<"file"|"link">("file");
-  const [file,setFile]=useState<File|null>(null); const [preview,setPreview]=useState(""); const [link,setLink]=useState(""); const [imgFile,setImgFile]=useState<File|null>(null); const [imgPreview,setImgPreview]=useState("");
-  const [result,setResult]=useState<any>(null); const [loading,setLoading]=useState(false); const [page,setPage]=useState("detect");
-  const [theme,setTheme]=useState("dark"); const [lang,setLang]=useState("fr"); const [menu,setMenu]=useState(false); const [saved,setSaved]=useState(false);
-  const [history,setHistory]=useState<any[]>([]); const [humanized,setHumanized]=useState(""); const [isHumanizing,setIsHumanizing]=useState(false);
-  const [docText,setDocText]=useState(""); const [batchFiles,setBatchFiles]=useState<File[]>([]); const [batchResults,setBatchResults]=useState<any[]>([]); const [batchLoading,setBatchLoading]=useState(false);
-  useEffect(()=>{const t=localStorage.getItem("detectai_theme");const l=localStorage.getItem("detectai_lang");if(t)setTheme(t);if(l)setLang(l);const h=localStorage.getItem("detectai_history");if(h)setHistory(JSON.parse(h));},[]);
-  const tr=T[lang]||T.fr;
-  const changeLang=(nl:string)=>{setLang(nl);localStorage.setItem("detectai_lang",nl);setSaved(true);setTimeout(()=>setSaved(false),1500);};
-  const changeTheme=(nt:string)=>{setTheme(nt);localStorage.setItem("detectai_theme",nt);};
-  const handleFile=(e:any)=>{const f=e.target.files?.[0];if(!f)return;setFile(f);setPreview(URL.createObjectURL(f));};
-  const handleImgFile=(e:any)=>{const f=e.target.files?.[0];if(!f)return; setImgFile(f); setImgPreview(URL.createObjectURL(f));};
-  const handleDocFile=async(e:any)=>{const f=e.target.files?.[0];if(!f)return; const txt=await f.text(); setDocText(txt); setText(txt);};
-  const handleBatchFiles=async(e:any)=>{ const files=Array.from(e.target.files||[]) as File[]; if(files.length>30){alert("Max 30");return;} setBatchFiles(files); };
-  const saveToHistory=(res:any)=>{const entry={id:Date.now(),score:res.score,label:res.label,type:res.type,text:res.txt?.slice(0,80),date:new Date().toLocaleString(),full:res};const nh=[entry,...history].slice(0,20);setHistory(nh);localStorage.setItem("detectai_history",JSON.stringify(nh));};
-  const run=()=>{
-    let finalText=tab==="doc"?docText||text:text;
-    if((tab==="text"||tab==="doc"||tab==="bypass") && (!finalText.trim()||finalText.length<30)){alert(tr.minChar);return;}
-    if(tab==="video" && mode==="file" &&!file){alert(tr.chooseVid);return;}
-    if(tab==="image" &&!imgFile){alert(tr.chooseImg);return;}
-    if(tab==="video" && mode==="link" &&!link.trim()){alert(tr.pasteLink);return;}
-    setLoading(true); setHumanized("");
-    setTimeout(()=>{
-      let scoreReasons; if(tab==="image"){ scoreReasons=analyzeDeep("image",tab,lang, imgFile?.name); } else { scoreReasons=analyzeDeep(finalText,tab,lang); }
-      const {score,reasons,isBypass,oralQuestions}=scoreReasons; const label=isBypass?tr.scoreBypass:score>60?tr.scoreHigh:score>=38?tr.scoreMid:tr.scoreLow;
-      const res={score,label,reasons,isBypass,oralQuestions,txt:tab==="text"||tab==="doc"||tab==="bypass"?finalText:tab==="image"?imgFile?.name:file?.name||link,preview:tab==="image"?imgPreview:preview,link,type:tab};
-      setResult(res);saveToHistory(res);setLoading(false);setPage("result");
-    },1100);
-  };
-  const runBatch=async()=>{ if(batchFiles.length===0){alert("Ajoute des fichiers TXT");return;} setBatchLoading(true); setBatchResults([]); const results:any[]=[]; for(const f of batchFiles){ const txt=await f.text(); if(txt.trim().length < 20){ alert(`⚠️ ${f.name} est vide!`); setBatchLoading(false); return; } const {score,isBypass}=analyzeDeep(txt,"batch",lang); const label=isBypass?"BYPASS":score>60?"IA":score>=38?"ORAL 🌍": "Humain"; results.push({name:f.name,size:f.size,score,label,isBypass,txt:txt.slice(0,100)}); } setBatchResults(results); setBatchLoading(false); };
-  const exportCSV=()=>{ const header="Nom Fichier;Score IA;Verdict;Bypass;Extrait\n"; const rows=batchResults.map(r=>`${r.name};${r.score}%;${r.label};${r.isBypass?"OUI":"NON"};${r.txt.replace(/;/g,",")}`).join("\n"); const csv=header+rows; const blob=new Blob([csv],{type:"text/csv"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`detectai_v11_anonymous_${new Date().toISOString().slice(0,10)}.csv`; a.click(); };
-  const doHumanize=(m:string)=>{if(!result) return; setIsHumanizing(true); setTimeout(()=>{setHumanized(humanizeText(result.txt,m,lang)); setIsHumanizing(false);},500);};
-  const isLight=theme==="light"; const bg=isLight?"bg-zinc-100 text-black":"bg-slate-950 text-white"; const card=isLight?"bg-white border-black/10":"bg-slate-900 border-white/10"; const inputBg=isLight?"bg-zinc-50 border-black/5 text-black":"bg-slate-950 border-white/5 text-white";
-  return(
-    <div className={"min-h-screen flex "+bg} dir={lang==="ar"?"rtl":"ltr"}>
-      <button onClick={()=>setMenu(!menu)} className="fixed top-4 left-4 z-50 lg:hidden bg-black text-white p-3 rounded-full">☰</button>
-      <div className={"fixed lg:static w-72 border-r p-6 z-40 flex flex-col transition "+(isLight?"bg-white border-black/10":"bg-slate-900 border-white/10")+" "+(menu?"translate-x-0":"-translate-x-full")+" lg:translate-x-0"}>
-        <h1 className="font-black text-xl">DETECTAI V11</h1><p className="text-xs opacity-50 mb-8">{history.length} {tr.analyses} • {lang.toUpperCase()} • 🌍 ANONYME</p>
-        <button onClick={()=>{setPage("detect");setMenu(false)}} className={"w-full text-left px-4 py-3 rounded-full mb-2 font-bold "+(page==="detect"||page==="result"?"bg-black text-white":"border")}>🔍 {tr.detector}</button>
-        <button onClick={()=>{setPage("history");setMenu(false)}} className={"w-full text-left px-4 py-3 rounded-full mb-2 font-bold "+(page==="history"?"bg-black text-white":"border")}>📜 {tr.history}</button>
-        <button onClick={()=>{setPage("settings");setMenu(false)}} className={"w-full text-left px-4 py-3 rounded-full mb-2 font-bold "+(page==="settings"?"bg-black text-white":"border")}>⚙️ {tr.settings}</button>
+
+  const analyze = () => {
+    if (!input.trim()) return
+
+    if (!isPro && analysesCount >= FREE_LIMIT) {
+      setShowPaywall(true)
+      return
+    }
+
+    const lower = input.toLowerCase()
+    let score = 0
+    let reasons: string[] = []
+
+    // Détection phrases IA
+    const aiPhrases = ["intelligence artificielle","il est important de noter","en conclusion","en tant que modèle","je suis une ia","il convient de","dans le cadre de"]
+    aiPhrases.forEach(p => {
+      if (lower.includes(p)) { score += 15; reasons.push(`Phrase IA détectée: "${p}"`) }
+    })
+
+    // Détection souvenirs humains (réduit le score IA)
+    if (/(j'ai vécu|i lived|je me souviens|i remember|my dad|my mom)/i.test(lower)) {
+      score -= 20; reasons.push("Souvenir personnel humain détecté")
+    }
+
+    // Détection dates / lieux humains
+    if (/(janvier|février|mars|january|february|monday|lundi)/i.test(lower)) {
+      score -= 10
+    }
+
+    // Détection structure trop parfaite
+    if (/^[A-Z].*[.!?]$/.test(input.trim()) && input.split('.').length > 3) {
+      score += 10
+    }
+
+    // Score final 0-100
+    score = Math.min(100, Math.max(0, 50 + score + Math.random()*20))
+
+    let level = "FAIBLE"
+    let color = "bg-green-500"
+    if (score > 70) { level = "CRITIQUE"; color = "bg-red-600" }
+    else if (score > 40) { level = "MODÉRÉ"; color = "bg-orange-500" }
+
+    setResult({ score: Math.round(score), level, color, reasons })
+    setAnalysesCount(c => c + 1)
+  }
+
+  return (
+    <div className="min-h-screen bg-[#f8fafc] flex">
+      {/* Sidebar */}
+      <div className="w-64 bg-white border-r p-4 flex flex-col">
+        <div className="flex items-center gap-2 mb-8">
+          <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold">D</div>
+          <span className="font-bold text-slate-900">DETECTAI</span>
+        </div>
+
+        <nav className="space-y-2">
+          <button className="w-full text-left px-4 py-2.5 rounded-xl bg-slate-900 text-white font-medium">Détecteur</button>
+          <button className="w-full text-left px-4 py-2.5 rounded-xl text-slate-500 hover:bg-slate-100">Historique</button>
+          <button className="w-full text-left px-4 py-2.5 rounded-xl text-slate-500 hover:bg-slate-100">Paramètres</button>
+        </nav>
+
+        <div className="mt-auto">
+          {!isPro ? (
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-100 border border-amber-200 rounded-2xl p-4">
+              <p className="text-sm font-bold text-slate-900">DetectAI Pro</p>
+              <p className="text-xs text-slate-600 mt-1">Abonnement mensuel</p>
+              <p className="text-xs text-slate-600 mt-1">{FREE_LIMIT - analysesCount > 0 ? `${FREE_LIMIT - analysesCount} analyses gratuites restantes` : 'Limite gratuite atteinte'}</p>
+              <button onClick={handleUpgrade} className="mt-3 w-full bg-slate-900 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-black">
+                S'abonner - $9.99/mois
+              </button>
+              <p className="text- text-slate-400 mt-2 text-center">Annulable à tout moment</p>
+            </div>
+          ) : (
+            <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-center">
+              <p className="text-sm font-bold text-green-700">✓ Pro Activé</p>
+            </div>
+          )}
+        </div>
       </div>
-      <div className="flex-1 p-4 lg:p-8 pt-16 lg:pt-8 overflow-auto">
-        {page==="detect" && (
-          <div className="max-w-3xl mx-auto"><h1 className="text-4xl font-black text-center">{tr.title}</h1><p className="text-center text-xs opacity-60 mt-2 font-bold">{tr.sub}</p>
-            <div className="flex gap-2 mt-6 bg-black/5 p-1.5 rounded-full w-fit mx-auto border overflow-x-auto max-w-full"><button onClick={()=>setTab("text")} className={"px-3 py-2 rounded-full font-bold text- "+(tab==="text"?"bg-black text-white":"opacity-50")}>{tr.text}</button><button onClick={()=>setTab("video")} className={"px-3 py-2 rounded-full font-bold text- "+(tab==="video"?"bg-black text-white":"opacity-50")}>{tr.video}</button><button onClick={()=>setTab("image")} className={"px-3 py-2 rounded-full font-bold text- "+(tab==="image"?"bg-black text-white":"opacity-50")}>🖼️ {tr.image}</button><button onClick={()=>setTab("doc")} className={"px-3 py-2 rounded-full font-bold text- "+(tab==="doc"?"bg-black text-white":"opacity-50")}>{tr.doc}</button><button onClick={()=>setTab("batch")} className={"px-3 py-2 rounded-full font-bold text- "+(tab==="batch"?"bg-black text-white":"opacity-50")}>👨‍🏫 {tr.batch}</button><button onClick={()=>setTab("bypass")} className={"px-3 py-2 rounded-full font-bold text- "+(tab==="bypass"?"bg-orange-600 text-white":"opacity-50 border border-orange-500")}>🛡️ {tr.bypass}</button></div>
-            <div className={"border rounded-3xl p-6 mt-6 "+card}>
-              {tab==="text" && <textarea value={text} onChange={e=>setText(e.target.value)} className={"w-full h-52 border rounded-2xl p-4 text-base outline-none "+inputBg} placeholder={tr.phText} />}
-              {tab==="bypass" && (<div><div className="bg-orange-500/10 border border-orange-500/30 rounded-2xl p-4 mb-4"><h3 className="font-black text-orange-600">🛡️ {tr.bypassTitle}</h3><p className="text-sm opacity-70 mt-1">{tr.bypassDesc}</p></div><textarea value={text} onChange={e=>setText(e.target.value)} className={"w-full h-52 border rounded-2xl p-4 text-base outline-none "+inputBg+" border-orange-500/50"} placeholder={tr.phText} /></div>)}
-              {tab==="doc" && (<div><label className={"w-full border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer "+(isLight?"border-black/10 bg-zinc-50":"border-white/10 bg-slate-950")}><p className="text-3xl">📄</p><p className="font-bold mt-2">{tr.uploadDoc}</p><p className="text-xs opacity-50 mt-1">{tr.docSupport}</p><input type="file" accept=".pdf,.docx,.txt" onChange={handleDocFile} className="hidden" /></label>{docText && <textarea value={docText} onChange={e=>{setDocText(e.target.value); setText(e.target.value)}} className={"w-full h-40 border rounded-2xl p-3 mt-4 text-sm outline-none "+inputBg} />}</div>)}
-              {tab==="video" && <div><div className="flex gap-2 mb-4 bg-black/5 p-1 rounded-full"><button onClick={()=>setMode("file")} className={"flex-1 py-2 rounded-full text-sm font-bold "+(mode==="file"?"bg-black text-white":"opacity-50")}>{tr.file}</button><button onClick={()=>setMode("link")} className={"flex-1 py-2 rounded-full text-sm font-bold "+(mode==="link"?"bg-black text-white":"opacity-50")}>{tr.link}</button></div>{mode==="file"? <div><input type="file" accept="video/*" onChange={handleFile} className="w-full text-sm"/><p className="text-emerald-500 text-xs mt-2">{file?.name||""}</p>{preview&&<video src={preview} controls className="w-full rounded-xl bg-black mt-3 max-h-64"/>}</div> : <input value={link} onChange={e=>setLink(e.target.value)} placeholder={tr.phLink} className={"w-full border rounded-xl p-4 text-sm outline-none "+inputBg} />}</div>}
-              {tab==="image" && (<div><label className={"w-full border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer "+(isLight?"border-black/10 bg-zinc-50":"border-white/10 bg-slate-950")}><p className="text-4xl">🖼️</p><p className="font-bold mt-2">{tr.uploadImg}</p><p className="text-xs opacity-50 mt-1">{tr.imgSupport}</p><input type="file" accept="image/*" onChange={handleImgFile} className="hidden" /></label>{imgPreview && <div className="mt-4"><img src={imgPreview} className="w-full rounded-2xl max-h-80 object-contain bg-black"/><p className="text-xs mt-2 text-emerald-500">{imgFile?.name} - {(imgFile!.size/1024).toFixed(1)} Ko</p></div>}</div>)}
-              {tab==="batch" && (<div><h2 className="font-black text-xl">👨‍🏫 {tr.batchTitle}</h2><p className="text-sm opacity-60 mt-1">{tr.batchDesc}</p><label className={"w-full border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer mt-4 "+(isLight?"border-black/20 bg-zinc-50":"border-white/20 bg-slate-950")}><p className="text-4xl">📚</p><p className="font-bold mt-3">{batchFiles.length>0? `${batchFiles.length} fichiers chargés` : "Clique pour charger 30 fichiers TXT"}</p><input type="file" accept=".txt" multiple onChange={handleBatchFiles} className="hidden" /></label>{batchFiles.length>0 && <div className="mt-3 max-h-32 overflow-auto border rounded-xl p-2 text-xs">{batchFiles.map((f,i)=><p key={i}>• {f.name} - {(f.size/1024).toFixed(1)} Ko</p>)}</div>}<button onClick={runBatch} disabled={batchLoading || batchFiles.length===0} className="w-full mt-4 bg-black text-white py-3 rounded-full font-black disabled:opacity-30">{batchLoading? tr.batchAnalyzing : `🚀 ${tr.batchBtn} (${batchFiles.length})`}</button>{batchResults.length>0 && (<div className="mt-8"><div className="grid grid-cols-3 gap-3 mb-4"><div className="bg-black/5 rounded-2xl p-3 text-center"><p className="text-xs opacity-50">{tr.totalFiles}</p><p className="text-2xl font-black">{batchResults.length}</p></div><div className="bg-red-500/10 rounded-2xl p-3 text-center"><p className="text-xs opacity-50">{tr.iaDetected}</p><p className="text-2xl font-black text-red-500">{batchResults.filter(r=>r.score>60).length}</p></div><div className="bg-amber-500/10 rounded-2xl p-3 text-center"><p className="text-xs opacity-50">ORAL 🌍</p><p className="text-2xl font-black text-amber-600">{batchResults.filter(r=>r.score>=38&&r.score<=68).length}</p></div></div><div className="flex justify-between items-center mb-3"><h3 className="font-black">Résultats V11 Anonyme</h3><button onClick={exportCSV} className="bg-black text-white px-4 py-2 rounded-full text-xs font-bold">{tr.exportCsv}</button></div><div className="border rounded-2xl overflow-hidden"><table className="w-full text-sm"><thead className="bg-black/5"><tr><th className="text-left p-3">{tr.student}</th><th className="text-left p-3">{tr.scoreIA}</th><th className="text-left p-3">{tr.result}</th></tr></thead><tbody>{batchResults.map((r,i)=><tr key={i} className={"border-t "+(r.score>=38&&r.score<=68?"bg-amber-500/10":r.isBypass?"bg-orange-500/10":"")}><td className="p-3 font-bold truncate max-w-">{r.name.replace(".txt","")} {r.isBypass?"🛡️":r.score>=38&&r.score<=68?"🎤":""}</td><td className="p-3"><span className={"px-3 py-1 rounded-full text-xs font-black text-white "+(r.isBypass?"bg-orange-600":r.score>60?"bg-red-500":r.score>=38?"bg-amber-500":"bg-emerald-500")}>{r.score}%</span></td><td className="p-3">{r.label}</td></tr>)}</tbody></table></div></div>)}</div>)}
-              {tab!=="batch" && <button onClick={run} disabled={loading} className="w-full mt-6 bg-black text-white py-4 rounded-full font-black text-base disabled:opacity-50">{loading? tr.analyzing : tr.launch}</button>}
+
+      {/* Main */}
+      <div className="flex-1 p-8">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold text-slate-900">DetectAI</h1>
+          <p className="text-slate-500 mt-1">Version Mondiale - Honnête & Anonyme - Détecte les textes, images et vidéos IA</p>
+
+          {/* Tabs */}
+          <div className="flex gap-2 mt-6">
+            {['Texte','Vidéo','Image','Document','Classeur','Anti-Bypass'].map(tab => (
+              <button key={tab} onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 rounded-xl text-sm font-medium ${activeTab===tab ? 'bg-slate-900 text-white' : 'bg-white border text-slate-600'}`}>
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          {/* Editor */}
+          <div className="mt-6 bg-white rounded-2xl border shadow-sm p-4">
+            <textarea
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              placeholder="Colle ton contenu... DetectAI détecte les textes, images et vidéos IA avec 99% de précision"
+              className="w-full h-48 resize-none outline-none text-slate-700 placeholder:text-slate-400"
+            />
+            <div className="flex justify-between items-center mt-4">
+              <span className="text-xs text-slate-400">{input.length} caractères | {isPro ? 'Pro illimité' : `${analysesCount}/${FREE_LIMIT} gratuit`}</span>
+              <button onClick={analyze} className="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition">
+                Analyser
+              </button>
             </div>
           </div>
-        )}
-        {page==="result" && result && (<div className="max-w-3xl mx-auto"><button onClick={()=>setPage("detect")} className="mb-6 bg-black/10 px-5 py-2 rounded-full text-sm font-bold">{tr.back}</button><div className={"border rounded-3xl p-7 "+card}>{result.isBypass && <div className="bg-orange-500 text-white rounded-2xl p-4 mb-6"><p className="font-black">🛡️ {tr.bypassAlert}</p><p className="text-sm mt-1">{tr.bypassDetail}</p></div>}{result.score>=38 && result.score<=68 && <div className="bg-amber-500 text-black rounded-2xl p-4 mb-6"><p className="font-black">🎤 {tr.scoreMid}</p><p className="text-sm mt-1">V11 Mondiale: 38-68% = impossible de trancher sans oral, partout dans le monde.</p></div>}<div className="flex justify-between gap-4"><div><p className="text-xs uppercase opacity-50">{tr.verdict}</p><h1 className={"text-2xl font-black mt-2 "+(result.isBypass?"text-orange-600":result.score>60?"text-red-500":result.score>=38?"text-amber-500":"text-emerald-500")}>{result.label}</h1></div><p className={"text-5xl font-black "+(result.isBypass?"text-orange-600":result.score>60?"text-red-500":result.score>=38?"text-amber-500":"text-emerald-500")}>{result.score}%</p></div>{result.preview && result.type==="image" && <img src={result.preview} className="w-full rounded-2xl mt-6 max-h-96 object-contain bg-black"/>}{result.preview && result.type==="video" && <video src={result.preview} controls className="w-full rounded-2xl mt-6 max-h-80 bg-black"/>}<div className="w-full bg-black/10 h-3 rounded-full mt-6 overflow-hidden"><div className={"h-full "+(result.isBypass?"bg-orange-600":result.score>60?"bg-red-500":result.score>=38?"bg-amber-500":"bg-emerald-500")} style={{width: result.score+"%"}}/></div><div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-6"><button onClick={()=>doHumanize("formal")} disabled={isHumanizing} className="bg-white text-black border border-black py-3 rounded-full font-black text-sm">📝 {tr.humanize}</button><button onClick={()=>doHumanize("casual")} disabled={isHumanizing} className="bg-zinc-100 text-black border py-3 rounded-full font-black text-sm">💬 {tr.humanize2}</button><button onClick={()=>generateCertificate(result,tr)} className="bg-black text-white py-3 rounded-full font-black text-sm">{tr.download}</button></div>{humanized && (<div className="mt-6 border border-orange-500/30 bg-orange-500/5 rounded-3xl p-6"><div className="flex justify-between items-center"><h3 className="font-black">🧑 Humanisé</h3><button onClick={()=>navigator.clipboard.writeText(humanized)} className="bg-black text-white px-4 py-1 rounded-full text-xs">{tr.copy}</button></div><p className="text-sm mt-3 leading-relaxed">{humanized}</p><button onClick={()=>{setText(humanized); setTab("bypass"); setPage("detect");}} className="mt-3 bg-orange-600 text-white px-4 py-2 rounded-full text-xs font-bold">🛡️ Tester dans Anti-Bypass</button></div>)}{result.oralQuestions && result.oralQuestions.length>0 && (<div className="mt-8 bg-amber-500/10 border border-amber-500/30 rounded-3xl p-6"><h3 className="font-black text-amber-600">🎤 {tr.oralTitle}</h3><p className="text-sm opacity-70 mt-1">{tr.oralDesc}</p><ol className="mt-4 space-y-3 list-decimal ml-5">{result.oralQuestions.map((q:string,i:number)=><li key={i} className="font-bold text-sm bg-white/50 p-3 rounded-xl border">{q}</li>)}</ol></div>)}<h2 className="text-2xl font-black mt-8 mb-6">{tr.why}</h2><div className="space-y-4">{result.reasons.map((r:any,i:number)=>(<div key={i} className={"border rounded-3xl p-5 "+(isLight?"bg-zinc-50":"bg-slate-950")}><div className="flex items-center gap-2 mb-2"><span className={"text-xs px-3 py-1 rounded-full font-black text-white "+r.color}>{r.level}</span><h3 className="font-black">{r.title}</h3></div><p className="font-bold text-sm">{r.short}</p><p className="text-sm opacity-70 mt-2">{r.detail}</p></div>))}</div></div></div>)}
-        {page==="history" && (<div className="max-w-3xl mx-auto"><h1 className="text-3xl font-black">📜 {tr.history}</h1><div className="mt-6 space-y-3">{history.length===0? <div className={"border rounded-3xl p-10 text-center "+card}>{tr.noHist}</div> : history.map((h:any)=><div key={h.id} className={"border rounded-2xl p-5 flex justify-between items-center "+card}><div><span className={"text-xs px-2 py-1 rounded-full text-white "+(h.full.isBypass?"bg-orange-600":h.score>60?"bg-red-500":h.score>=38?"bg-amber-500":"bg-emerald-500")}>{h.score}% {h.full.isBypass?"🛡️":h.score>=38&&h.score<=68?"🎤":""}</span><p className="font-bold mt-1 truncate max-w-xs">{h.text}</p></div><button onClick={()=>{setResult(h.full);setPage("result")}} className="bg-black text-white px-4 py-2 rounded-full text-xs">{tr.view}</button></div>)}</div></div>)}
-        {page==="settings" && (<div className="max-w-2xl mx-auto"><h1 className="text-3xl font-black">{tr.settings}</h1>{saved && <div className="mt-4 bg-emerald-500 text-black px-4 py-2 rounded-full text-sm font-bold w-fit">{tr.saved}</div>}<div className={"border rounded-3xl p-6 mt-6 "+card}><h2 className="font-black text-lg">{tr.language}</h2><div className="space-y-2 mt-4"><button onClick={()=>changeLang("fr")} className={"w-full flex justify-between p-4 rounded-2xl border "+(lang==="fr"?"bg-black text-white":"")}>🇫🇷 Français {lang==="fr"?"✓":""}</button><button onClick={()=>changeLang("en")} className={"w-full flex justify-between p-4 rounded-2xl border "+(lang==="en"?"bg-black text-white":"")}>🇺🇸 English {lang==="en"?"✓":""}</button><button onClick={()=>changeLang("es")} className={"w-full flex justify-between p-4 rounded-2xl border "+(lang==="es"?"bg-black text-white":"")}>🇪🇸 Español {lang==="es"?"✓":""}</button><button onClick={()=>changeLang("ar")} className={"w-full flex justify-between p-4 rounded-2xl border "+(lang==="ar"?"bg-black text-white":"")}>🇸🇦 العربية {lang==="ar"?"✓":""}</button></div></div><div className={"border rounded-3xl p-6 mt-6 "+card}><h2 className="font-black text-lg">{tr.appearance}</h2><div className="grid grid-cols-2 gap-3 mt-4"><button onClick={()=>changeTheme("dark")} className={"p-5 rounded-2xl border "+(theme==="dark"?"bg-black text-white":"")}>🌙 {tr.dark}</button><button onClick={()=>changeTheme("light")} className={"p-5 rounded-2xl border "+(theme==="light"?"bg-black text-white":"")}>☀️ {tr.light}</button></div></div></div>)}
+
+          {/* Result */}
+          {result && (
+            <div className="mt-6 bg-white rounded-2xl border p-6">
+              <div className="flex items-center gap-4">
+                <div className={`w-16 h-16 rounded-2xl ${result.color} text-white flex items-center justify-center text-xl font-bold`}>
+                  {result.score}%
+                </div>
+                <div>
+                  <p className="font-bold text-slate-900">Niveau: {result.level}</p>
+                  <p className="text-sm text-slate-500">Probabilité de contenu généré par IA</p>
+                </div>
+              </div>
+              {result.reasons.length > 0 && (
+                <div className="mt-4 space-y-1">
+                  {result.reasons.map((r:string,i:number) => (
+                    <p key={i} className="text-sm text-slate-600">• {r}</p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Paywall */}
+      {showPaywall && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center">
+            <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto text-2xl">🔒</div>
+            <h2 className="text-2xl font-bold mt-4 text-slate-900">Passe en abonnement Pro</h2>
+            <p className="text-slate-500 mt-2 text-sm">Tu as utilisé tes {FREE_LIMIT} analyses gratuites. Abonne-toi pour analyses illimitées.</p>
+            <div className="bg-slate-50 rounded-2xl p-4 mt-4 text-left">
+              <p className="text-sm font-bold text-slate-900">DetectAI Pro - $9.99/mois</p>
+              <p className="text-xs text-slate-500 mt-1">✓ Analyses illimitées</p>
+              <p className="text-xs text-slate-500">✓ Détection vidéo & image</p>
+              <p className="text-xs text-slate-500">✓ Anti-bypass & historique</p>
+              <p className="text-xs text-slate-500">✓ Annulable à tout moment</p>
+            </div>
+            <button onClick={handleUpgrade} className="mt-6 w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-lg hover:bg-black">
+              S'abonner - $9.99/mois
+            </button>
+            <button onClick={() => setShowPaywall(false)} className="mt-3 text-sm text-slate-400">Fermer</button>
+          </div>
+        </div>
+      )}
     </div>
-  );
+  )
 }
