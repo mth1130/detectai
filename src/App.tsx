@@ -1,179 +1,89 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-
 type TabType = 'Texte' | 'Vidéo' | 'Image' | 'Document' | 'Classeur' | 'Anti-Bypass'
 type SideType = 'detecteur' | 'historique' | 'parametres'
 type LangType = 'fr' | 'en' | 'es' | 'ar'
-
 const FREE_LIMIT = 3
 const CHECKOUT = "https://detectai-labs.lemonsqueezy.com/checkout/buy/09980aca-6baa-4075-8917-7b2766dc6210"
-
 const T = {
-  fr: { title: "DetectAI", sub: "Version Mondiale • Honnête & Anonyme • Texte, Image, Vidéo, Document, Classeur", detecteur: "Détecteur", historique: "Historique", parametres: "Paramètres", placeholder: "Colle ton texte ici...", analyses: "analyses gratuites restantes", sAbonner: "S'abonner - $9.99/mois", annulable: "Annulable • Payoneer", gratuit: "3 analyses gratuites", pro: "DetectAI Pro", mois: "Abonnement mensuel • $9.99", analyser: "Analyser", caracteres: "caractères", gratuitCount: "gratuit", proIllimite: "Pro illimité", langue: "Langue", theme: "Thème", clair: "Clair", sombre: "Sombre", planActuel: "Plan actuel", upgrade: "Upgrade $9.99", lienAbo: "Lien d'abonnement", gerer: "Gérer mon abonnement LemonSqueezy →", support: "Support: support@detectai-labs.com", videoDesc: "Dépose ta vidéo ici (MP4, MOV, WebM)", imageDesc: "Dépose ton image ici (JPG, PNG, WebP)", docDesc: "Dépose ton document ici (PDF, DOCX, TXT)", classeurDesc: "Dépose ton classeur ici (XLSX, CSV)", bypassDesc: "Teste les techniques de contournement", drop: "Glisse-dépose ou clique pour parcourir", limite: "Limite gratuite atteinte", limiteDesc: "Tu as utilisé tes 3 analyses gratuites. Passe en Pro pour analyses illimitées.", debloquer: "Débloquer DetectAI Pro - $9.99" },
-  en: { title: "DetectAI", sub: "World Version • Honest & Anonymous • Text, Image, Video, Document, Workbook", detecteur: "Detector", historique: "History", parametres: "Settings", placeholder: "Paste your text here...", analyses: "free analyses left", sAbonner: "Subscribe - $9.99/month", annulable: "Cancelable • Payoneer", gratuit: "3 free analyses", pro: "DetectAI Pro", mois: "Monthly subscription • $9.99", analyser: "Analyze", caracteres: "characters", gratuitCount: "free", proIllimite: "Pro unlimited", langue: "Language", theme: "Theme", clair: "Light", sombre: "Dark", planActuel: "Current plan", upgrade: "Upgrade $9.99", lienAbo: "Subscription link", gerer: "Manage LemonSqueezy subscription →", support: "Support: support@detectai-labs.com", videoDesc: "Drop your video here (MP4, MOV, WebM)", imageDesc: "Drop your image here (JPG, PNG, WebP)", docDesc: "Drop your document here (PDF, DOCX, TXT)", classeurDesc: "Drop your workbook here (XLSX, CSV)", bypassDesc: "Test bypass techniques", drop: "Drag & drop or click to browse", limite: "Free limit reached", limiteDesc: "You used your 3 free analyses. Go Pro for unlimited.", debloquer: "Unlock DetectAI Pro - $9.99" },
-  es: { title: "DetectAI", sub: "Versión Mundial • Honesta y Anónima", detecteur: "Detector", historique: "Historial", parametres: "Ajustes", placeholder: "Pega tu texto aquí...", analyses: "análisis gratuitos restantes", sAbonner: "Suscribirse - $9.99/mes", annulable: "Cancelable • Payoneer", gratuit: "3 análisis gratuitos", pro: "DetectAI Pro", mois: "Suscripción mensual • $9.99", analyser: "Analizar", caracteres: "caracteres", gratuitCount: "gratis", proIllimite: "Pro ilimitado", langue: "Idioma", theme: "Tema", clair: "Claro", sombre: "Oscuro", planActuel: "Plan actual", upgrade: "Mejorar $9.99", lienAbo: "Enlace de suscripción", gerer: "Gestionar suscripción →", support: "Soporte: support@detectai-labs.com", videoDesc: "Suelta tu video aquí", imageDesc: "Suelta tu imagen aquí", docDesc: "Suelta tu documento aquí", classeurDesc: "Suelta tu libro aquí", bypassDesc: "Prueba técnicas de evasión", drop: "Arrastra y suelta o haz clic", limite: "Límite gratuito alcanzado", limiteDesc: "Usaste tus 3 análisis gratis.", debloquer: "Desbloquear DetectAI Pro - $9.99" },
-  ar: { title: "DetectAI", sub: "الإصدار العالمي • صادق ومجهول", detecteur: "الكاشف", historique: "السجل", parametres: "الإعدادات", placeholder: "الصق النص هنا...", analyses: "تحليلات مجانية متبقية", sAbonner: "اشترك - $9.99/شهر", annulable: "قابل للإلغاء • Payoneer", gratuit: "3 تحليلات مجانية", pro: "DetectAI Pro", mois: "اشتراك شهري • $9.99", analyser: "حلل", caracteres: "حرف", gratuitCount: "مجاني", proIllimite: "Pro غير محدود", langue: "اللغة", theme: "المظهر", clair: "فاتح", sombre: "داكن", planActuel: "الخطة الحالية", upgrade: "ترقية $9.99", lienAbo: "رابط الاشتراك", gerer: "إدارة الاشتراك →", support: "الدعم: support@detectai-labs.com", videoDesc: "أسقط الفيديو هنا", imageDesc: "أسقط الصورة هنا", docDesc: "أسقط المستند هنا", classeurDesc: "أسقط المصنف هنا", bypassDesc: "اختبر تقنيات التجاوز", drop: "اسحب وأفلت أو انقر للتصفح", limite: "تم الوصول للحد المجاني", limiteDesc: "استخدمت 3 تحليلات مجانية.", debloquer: "فتح DetectAI Pro - $9.99" }
+  fr: { title: "DetectAI", sub: "Version Mondiale • Honnête & Anonyme • Texte, Image, Vidéo, Document, Classeur", detecteur: "Détecteur", historique: "Historique", parametres: "Paramètres", placeholder: "Colle ton texte ici...", analyses: "analyses gratuites restantes", sAbonner: "S'abonner - $9.99/mois", annulable: "Annulable • Payoneer", pro: "DetectAI Pro", mois: "Abonnement mensuel • $9.99", analyser: "Analyser", caracteres: "caractères", gratuitCount: "gratuit", proIllimite: "Pro illimité", langue: "Langue", theme: "Thème", clair: "Clair", sombre: "Sombre", planActuel: "Plan actuel", upgrade: "Upgrade $9.99", lienAbo: "Lien d'abonnement", gerer: "Gérer mon abonnement LemonSqueezy →", support: "Support: support@detectai-labs.com", videoDesc: "Dépose ta vidéo ici (MP4, MOV, WebM)", imageDesc: "Dépose ton image ici (JPG, PNG, WebP)", docDesc: "Dépose ton document ici (PDF, DOCX, TXT)", classeurDesc: "Dépose ton classeur ici (XLSX, CSV)", bypassDesc: "Teste les techniques de contournement", drop: "Glisse-dépose ou clique pour parcourir", limite: "Limite gratuite atteinte", limiteDesc: "Tu as utilisé tes 3 analyses gratuites. Passe en Pro pour analyses illimitées.", debloquer: "Débloquer DetectAI Pro - $9.99", fileSelected: "Fichier sélectionné", noHistory: "Aucune analyse pour l'instant" },
+  en: { title: "DetectAI", sub: "World Version • Honest & Anonymous • Text, Image, Video, Document, Workbook", detecteur: "Detector", historique: "History", parametres: "Settings", placeholder: "Paste your text here...", analyses: "free analyses left", sAbonner: "Subscribe - $9.99/month", annulable: "Cancelable • Payoneer", pro: "DetectAI Pro", mois: "Monthly subscription • $9.99", analyser: "Analyze", caracteres: "characters", gratuitCount: "free", proIllimite: "Pro unlimited", langue: "Language", theme: "Theme", clair: "Light", sombre: "Dark", planActuel: "Current plan", upgrade: "Upgrade $9.99", lienAbo: "Subscription link", gerer: "Manage LemonSqueezy subscription →", support: "Support: support@detectai-labs.com", videoDesc: "Drop your video here (MP4, MOV, WebM)", imageDesc: "Drop your image here (JPG, PNG, WebP)", docDesc: "Drop your document here (PDF, DOCX, TXT)", classeurDesc: "Drop your workbook here (XLSX, CSV)", bypassDesc: "Test bypass techniques", drop: "Drag & drop or click to browse", limite: "Free limit reached", limiteDesc: "You used your 3 free analyses. Go Pro for unlimited.", debloquer: "Unlock DetectAI Pro - $9.99", fileSelected: "File selected", noHistory: "No analysis yet" },
+  es: { title: "DetectAI", sub: "Versión Mundial • Honesta y Anónima", detecteur: "Detector", historique: "Historial", parametres: "Ajustes", placeholder: "Pega tu texto aquí...", analyses: "análisis gratuitos restantes", sAbonner: "Suscribirse - $9.99/mes", annulable: "Cancelable • Payoneer", pro: "DetectAI Pro", mois: "Suscripción mensual • $9.99", analyser: "Analizar", caracteres: "caracteres", gratuitCount: "gratis", proIllimite: "Pro ilimitado", langue: "Idioma", theme: "Tema", clair: "Claro", sombre: "Oscuro", planActuel: "Plan actual", upgrade: "Mejorar $9.99", lienAbo: "Enlace de suscripción", gerer: "Gestionar suscripción →", support: "Soporte: support@detectai-labs.com", videoDesc: "Suelta tu video aquí", imageDesc: "Suelta tu imagen aquí", docDesc: "Suelta tu documento aquí", classeurDesc: "Suelta tu libro aquí", bypassDesc: "Prueba técnicas de evasión", drop: "Arrastra y suelta o haz clic", limite: "Límite gratuito alcanzado", limiteDesc: "Usaste tus 3 análisis gratis.", debloquer: "Desbloquear DetectAI Pro - $9.99", fileSelected: "Archivo seleccionado", noHistory: "Sin análisis aún" },
+  ar: { title: "DetectAI", sub: "الإصدار العالمي • صادق ومجهول", detecteur: "الكاشف", historique: "السجل", parametres: "الإعدادات", placeholder: "الصق النص هنا...", analyses: "تحليلات مجانية متبقية", sAbonner: "اشترك - $9.99/شهر", annulable: "قابل للإلغاء • Payoneer", pro: "DetectAI Pro", mois: "اشتراك شهري • $9.99", analyser: "حلل", caracteres: "حرف", gratuitCount: "مجاني", proIllimite: "Pro غير محدود", langue: "اللغة", theme: "المظهر", clair: "فاتح", sombre: "داكن", planActuel: "الخطة الحالية", upgrade: "ترقية $9.99", lienAbo: "رابط الاشتراك", gerer: "إدارة الاشتراك →", support: "الدعم: support@detectai-labs.com", videoDesc: "أسقط الفيديو هنا", imageDesc: "أسقط الصورة هنا", docDesc: "أسقط المستند هنا", classeurDesc: "أسقط المصنف هنا", bypassDesc: "اختبر تقنيات التجاوز", drop: "اسحب وأفلت أو انقر للتصفح", limite: "تم الوصول للحد المجاني", limiteDesc: "استخدمت 3 تحليلات مجانية.", debloquer: "فتح DetectAI Pro - $9.99", fileSelected: "تم اختيار الملف", noHistory: "لا يوجد تحليل بعد" }
 }
-
+interface AnalyseItem { id: string; tab: TabType; preview: string; score: number; date: string }
 export default function App() {
   const [input, setInput] = useState('')
   const [result, setResult] = useState<any>(null)
   const [activeTab, setActiveTab] = useState<TabType>('Texte')
   const [activeSide, setActiveSide] = useState<SideType>('detecteur')
   const [analysesCount, setAnalysesCount] = useState(0)
+  const [history, setHistory] = useState<AnalyseItem[]>([])
   const [isPro, setIsPro] = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [lang, setLang] = useState<LangType>('fr')
   const [theme, setTheme] = useState<'clair' | 'sombre'>('clair')
+  const [fileName, setFileName] = useState<string>('')
   const fileRef = useRef<HTMLInputElement>(null)
   const tr = T[lang]
-
-  useEffect(() => {
-    const s = document.createElement('script')
-    s.src = 'https://app.lemonsqueezy.com/js/lemon.js'
-    s.defer = true
-    document.body.appendChild(s)
-  }, [])
-
+  const isDark = theme === 'sombre'
+  useEffect(() => { const s = document.createElement('script'); s.src = 'https://app.lemonsqueezy.com/js/lemon.js'; s.defer = true; document.body.appendChild(s) }, [])
   const handleUpgrade = () => {
     try {
       const w = window as any
-      if (w.LemonSqueezy && w.LemonSqueezy.Url) {
-        w.LemonSqueezy.Url.Open(CHECKOUT)
-      } else {
-        window.open(CHECKOUT, '_blank')
-      }
-    } catch {
-      window.open(CHECKOUT, '_blank')
-    }
+      if (w.LemonSqueezy && w.LemonSqueezy.Url && w.LemonSqueezy.Url.Open) { w.LemonSqueezy.Url.Open(CHECKOUT) }
+      else { window.open(CHECKOUT, '_blank', 'noopener') }
+    } catch { window.open(CHECKOUT, '_blank', 'noopener') }
   }
-
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0]
+    if (f) { setFileName(f.name); setInput(`Fichier: ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)`) }
+  }
   const analyze = () => {
-    if (!input.trim() && activeTab === 'Texte') return
+    if (activeTab === 'Texte' &&!input.trim()) return
+    if (activeTab!== 'Texte' &&!fileName &&!input.trim()) { fileRef.current?.click(); return }
     if (!isPro && analysesCount >= FREE_LIMIT) { setShowPaywall(true); return }
     let score = 50 + Math.random()*20
-    if (/(je me souviens|j'ai vécu|ptdr|haha|my dad)/i.test(input)) score -= 25
-    if (/(intelligence artificielle|en conclusion|il est important de noter)/i.test(input)) score += 25
+    const content = input + fileName
+    if (/(je me souviens|j'ai vécu|ptdr|haha)/i.test(content)) score -= 25
+    if (/(intelligence artificielle|en conclusion)/i.test(content)) score += 25
+    if (activeTab!== 'Texte' && fileName) score = 60 + Math.random()*30
     score = Math.min(100, Math.max(0, score))
     let level = "FAIBLE", color = "bg-green-500"
     if (score > 70) { level = "CRITIQUE"; color = "bg-red-600" } else if (score > 40) { level = "MODÉRÉ"; color = "bg-orange-500" }
     setResult({ score: Math.round(score), level, color })
     setAnalysesCount(c => c+1)
+    const preview = activeTab === 'Texte'? input.slice(0,80) : fileName || `${activeTab} analysé`
+    setHistory(h => [{ id: Date.now().toString(), tab: activeTab, preview, score: Math.round(score), date: new Date().toLocaleTimeString() },...h].slice(0,20))
   }
-
-  const isDark = theme === 'sombre'
-
   return (
     <div className={`min-h-screen flex flex-col lg:flex-row ${isDark? 'bg-[#0f172a] text-white' : 'bg-[#f8fafc] text-[#0f172a]'}`}>
       <header className={`lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'}`}>
         <div className="flex items-center gap-2">
           <button onClick={() => setMobileOpen(!mobileOpen)} className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xl">{mobileOpen? '✕' : '☰'}</button>
-          <div className="flex items-center gap-2 ml-1">
-            <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold">D</div>
-            <span className="font-bold">DETECTAI</span>
-            <span className="text- bg-slate-900 text-white px-2 py-0.5 rounded-full font-bold">PRO</span>
-          </div>
+          <div className="flex items-center gap-2 ml-1"><div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold">D</div><span className="font-bold">DETECTAI</span><span className="text- bg-slate-900 text-white px-2 py-0.5 rounded-full font-bold">PRO</span></div>
         </div>
         <div className="text-xs font-bold bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full">{analysesCount}/{FREE_LIMIT}</div>
       </header>
-
       {mobileOpen && <div className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-20" onClick={() => setMobileOpen(false)} />}
-
       <aside className={`${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e8ecf0]'} border-r flex flex-col lg:w-64 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 fixed inset-y-0 left-0 w-[80%] max-w- z-30 h- transition-transform duration-300 ${mobileOpen? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="p-5 flex flex-col h-full">
-          <div className="hidden lg:flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold">D</div>
-            <span className="font-bold">DETECTAI</span>
-            <span className="text- bg-slate-900 text-white px-2 py-0.5 rounded-full font-bold">PRO</span>
-          </div>
-          <div className="lg:hidden flex justify-between items-center mb-6">
-            <span className="font-bold">Menu</span>
-            <button onClick={() => setMobileOpen(false)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">✕</button>
-          </div>
+          <div className="hidden lg:flex items-center gap-2 mb-8"><div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold">D</div><span className="font-bold">DETECTAI</span><span className="text- bg-slate-900 text-white px-2 py-0.5 rounded-full font-bold">PRO</span></div>
           <nav className="space-y-2">
             <button onClick={() => { setActiveSide('detecteur'); setMobileOpen(false) }} className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium ${activeSide==='detecteur'? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}>◉ {tr.detecteur}</button>
-            <button onClick={() => { setActiveSide('historique'); setMobileOpen(false) }} className={`w-full text-left px-4 py-2.5 rounded-xl text-sm ${activeSide==='historique'? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}>🕒 {tr.historique}</button>
+            <button onClick={() => { setActiveSide('historique'); setMobileOpen(false) }} className={`w-full text-left px-4 py-2.5 rounded-xl text-sm flex justify-between ${activeSide==='historique'? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}><span>🕒 {tr.historique}</span><span className="text-xs bg-slate-100 px-2 py-0.5 rounded-full">{analysesCount}</span></button>
             <button onClick={() => { setActiveSide('parametres'); setMobileOpen(false) }} className={`w-full text-left px-4 py-2.5 rounded-xl text-sm ${activeSide==='parametres'? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}>⚙️ {tr.parametres}</button>
           </nav>
-          <div className="mt-auto">
-            <div className="bg-gradient-to-br from-amber-50 to-yellow-100 border border-amber-200 rounded-2xl p-4">
-              <p className="text-sm font-bold text-slate-900 flex items-center gap-2">{tr.pro} <span className="bg-amber-200 text- px-2 py-0.5 rounded-full">6000 F</span></p>
-              <p className="text-xs text-slate-600 mt-1">{tr.mois}<br/>{FREE_LIMIT - analysesCount > 0? `${FREE_LIMIT - analysesCount} ${tr.analyses}` : tr.limite}</p>
-              <button onClick={handleUpgrade} className="mt-3 w-full bg-slate-900 text-white py-2.5 rounded-xl text-sm font-bold">{tr.sAbonner}</button>
-              <p className="text- text-center text-slate-500 mt-2">{tr.annulable}</p>
-            </div>
-          </div>
+          <div className="mt-auto"><div className="bg-gradient-to-br from-amber-50 to-yellow-100 border border-amber-200 rounded-2xl p-4"><p className="text-sm font-bold flex items-center gap-2">{tr.pro} <span className="bg-amber-200 text- px-2 py-0.5 rounded-full">6000 F</span></p><p className="text-xs text-slate-600 mt-1">{tr.mois}<br/>{FREE_LIMIT - analysesCount > 0? `${FREE_LIMIT - analysesCount} ${tr.analyses}` : tr.limite}</p><button onClick={handleUpgrade} className="mt-3 w-full bg-slate-900 text-white py-2.5 rounded-xl text-sm font-bold">{tr.sAbonner}</button><p className="text- text-center text-slate-500 mt-2">{tr.annulable}</p></div></div>
         </div>
       </aside>
-
-      <main className="flex-1 min-w-0">
-        <div className="max-w-4xl mx-auto p-4 lg:p-8">
-          {activeSide === 'detecteur' && (
-            <>
-              <div className="hidden lg:block">
-                <h1 className="text-3xl font-bold tracking-tight">{tr.title}</h1>
-                <p className="text-slate-500 mt-1 text-sm">{tr.sub}</p>
-              </div>
-              <div className="flex gap-2 mt-4 lg:mt-6 overflow-x-auto pb-2">
-                {(['Texte','Vidéo','Image','Document','Classeur','Anti-Bypass'] as TabType[]).map(tab => (
-                  <button key={tab} onClick={() => setActiveTab(tab)} className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium ${activeTab===tab? 'bg-slate-900 text-white' : 'bg-white border text-slate-600'}`}>{tab}</button>
-                ))}
-              </div>
-              <div className={`mt-4 rounded-2xl border shadow-sm p-4 ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'}`}>
-                {activeTab === 'Texte'? (
-                  <>
-                    <textarea value={input} onChange={e=>setInput(e.target.value)} placeholder={tr.placeholder} className={`w-full h-48 resize-none outline-none text- ${isDark? 'bg-[#1e293b] text-white' : 'bg-white text-slate-700'}`} />
-                    <div className="flex flex-col sm:flex-row sm:justify-between gap-3 mt-4 pt-4 border-t border-slate-100">
-                      <span className="text-xs text-slate-400">{input.length} {tr.caracteres} • {isPro? tr.proIllimite : `${analysesCount}/${FREE_LIMIT} ${tr.gratuitCount}`}</span>
-                      <button onClick={analyze} className="w-full sm:w-auto bg-slate-900 text-white px-8 py-3 rounded-xl font-bold">Analyser →</button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="py-12 text-center cursor-pointer" onClick={() => fileRef.current?.click()}>
-                    <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">📁</div>
-                    <p className="font-medium">{activeTab === 'Vidéo'? tr.videoDesc : activeTab === 'Image'? tr.imageDesc : activeTab === 'Document'? tr.docDesc : activeTab === 'Classeur'? tr.classeurDesc : tr.bypassDesc}</p>
-                    <p className="text-sm text-slate-500 mt-1">{tr.drop}</p>
-                    <button className="mt-4 bg-slate-900 text-white px-5 py-2 rounded-xl text-sm font-bold">Parcourir</button>
-                    <input ref={fileRef} type="file" className="hidden" />
-                  </div>
-                )}
-              </div>
-              {result && (
-                <div className={`mt-6 rounded-2xl border p-6 ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white'}`}>
-                  <div className="flex items-center gap-4">
-                    <div className={`w-16 h-16 rounded-2xl ${result.color} text-white flex items-center justify-center text-xl font-bold`}>{result.score}%</div>
-                    <div><p className="font-bold">Niveau: {result.level}</p><p className="text-sm text-slate-500">Probabilité IA</p></div>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-          {activeSide === 'parametres' && (
-            <div className="max-w- space-y-4">
-              <div className={`rounded-2xl border p-6 md:p-8 ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white'}`}>
-                <h2 className="text-xl font-bold mb-6">{tr.parametres}</h2>
-                <div className="pb-6 border-b mb-6 flex justify-between items-center"><div><p className="font-semibold text-sm">{tr.planActuel}</p><p className="text-xs text-slate-500">Gratuit 0/3</p></div><button onClick={handleUpgrade} className="h-10 px-5 rounded-xl bg-slate-900 text-white text-sm font-bold">{tr.upgrade}</button></div>
-                <div className="pb-6 border-b mb-6"><p className="font-semibold text-sm mb-3">🌐 {tr.langue}</p><div className="grid grid-cols-2 gap-3"><button onClick={() => setLang('fr')} className={`h- rounded-xl border-2 ${lang==='fr'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🇫🇷 Français</button><button onClick={() => setLang('en')} className={`h- rounded-xl border-2 ${lang==='en'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🇺🇸 English</button><button onClick={() => setLang('es')} className={`h- rounded-xl border-2 ${lang==='es'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🇪🇸 Español</button><button onClick={() => setLang('ar')} className={`h- rounded-xl border-2 ${lang==='ar'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🇸🇦 العربية</button></div></div>
-                <div className="pb-6 border-b mb-6"><p className="font-semibold text-sm mb-3">🎨 {tr.theme}</p><div className="grid grid-cols-2 gap-3"><button onClick={() => setTheme('clair')} className={`h- rounded-xl border-2 ${theme==='clair'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>☀️ Clair</button><button onClick={() => setTheme('sombre')} className={`h- rounded-xl border-2 ${theme==='sombre'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🌙 Sombre</button></div></div>
-                <div><p className="font-semibold text-sm mb-2">{tr.lienAbo}</p><p className="text- font-mono break-all bg-slate-50 p-3 rounded-xl border">{CHECKOUT}</p><a href={CHECKOUT} target="_blank" className="inline-flex mt-3 text-xs underline">{tr.gerer}</a><p className="text- text-slate-400 mt-4">{tr.support}</p></div>
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
-
-      {showPaywall && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-          <div className="bg-white rounded- p-6 max-w-md w-full text-center shadow-2xl">
-            <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto text-2xl">🔒</div>
-            <h2 className="text-2xl font-bold mt-4 text-slate-900">{tr.limite}</h2>
-            <p className="text-slate-500 mt-2 text-sm">{tr.limiteDesc}</p>
-            <button onClick={handleUpgrade} className="mt-6 w-full bg-slate-900 text-white py-4 rounded-2xl font-bold">{tr.debloquer}</button>
-            <button onClick={() => setShowPaywall(false)} className="mt-3 text-sm text-slate-400 underline">Fermer</button>
-          </div>
-        </div>
-      )}
+      <main className="flex-1 min-w-0"><div className="max-w-4xl mx-auto p-4 lg:p-8">
+        {activeSide === 'detecteur' && (<><div className="hidden lg:block"><h1 className="text-3xl font-bold">{tr.title}</h1><p className="text-slate-500 mt-1 text-sm">{tr.sub}</p></div><div className="flex gap-2 mt-4 lg:mt-6 overflow-x-auto pb-2">{(['Texte','Vidéo','Image','Document','Classeur','Anti-Bypass'] as TabType[]).map(tab => (<button key={tab} onClick={() => { setActiveTab(tab); setResult(null); setFileName('') }} className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium ${activeTab===tab? 'bg-slate-900 text-white' : 'bg-white border text-slate-600'}`}>{tab}</button>))}</div><div className={`mt-4 rounded-2xl border shadow-sm p-4 ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white'}`}>{activeTab === 'Texte'? (<><textarea value={input} onChange={e=>setInput(e.target.value)} placeholder={tr.placeholder} className={`w-full h-48 resize-none outline-none text- ${isDark? 'bg-[#1e293b] text-white' : 'bg-white text-slate-700'}`} /><div className="flex flex-col sm:flex-row sm:justify-between gap-3 mt-4 pt-4 border-t border-slate-100"><span className="text-xs text-slate-400">{input.length} {tr.caracteres}</span><button onClick={analyze} className="w-full sm:w-auto bg-slate-900 text-white px-8 py-3 rounded-xl font-bold">Analyser →</button></div></>) : (<div className="py-10 text-center"><div onClick={() => fileRef.current?.click()} className="cursor-pointer"><div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">📁</div><p className="font-medium">{activeTab === 'Vidéo'? tr.videoDesc : activeTab === 'Image'? tr.imageDesc : activeTab === 'Document'? tr.docDesc : activeTab === 'Classeur'? tr.classeurDesc : tr.bypassDesc}</p><p className="text-sm text-slate-500 mt-1">{tr.drop}</p>{fileName && <p className="text-xs mt-3 bg-slate-100 inline-block px-3 py-1 rounded-full">✓ {tr.fileSelected}: {fileName}</p>}<div className="mt-4 flex flex-col items-center gap-3"><button onClick={(e) => { e.stopPropagation(); fileRef.current?.click() }} className="bg-slate-900 text-white px-5 py-2 rounded-xl text-sm font-bold">Parcourir</button>{fileName && <button onClick={analyze} className="bg-green-600 text-white px-8 py-2.5 rounded-xl text-sm font-bold">Analyser {activeTab} →</button>}</div></div><input ref={fileRef} type="file" className="hidden" accept={activeTab==='Vidéo'? 'video/*' : activeTab==='Image'? 'image/*' : activeTab==='Document'? '.pdf,.docx,.txt' : activeTab==='Classeur'? '.xlsx,.csv' : '*/*'} onChange={onFileChange} /></div>)}</div>{result && (<div className={`mt-6 rounded-2xl border p-6 ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white'}`}><div className="flex items-center gap-4"><div className={`w-16 h-16 rounded-2xl ${result.color} text-white flex items-center justify-center text-xl font-bold`}>{result.score}%</div><div><p className="font-bold">Niveau: {result.level}</p><p className="text-sm text-slate-500">Probabilité IA • {activeTab}</p></div></div></div>)}</>)}
+        {activeSide === 'historique' && (<div className={`rounded-2xl border ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white'}`}><div className="p-6 border-b flex justify-between"><h2 className="font-bold text-lg">{tr.historique}</h2><span className="text-xs bg-slate-100 px-2 py-1 rounded-full">{history.length}</span></div>{history.length === 0? <div className="p-8 text-center text-sm text-slate-500">{tr.noHistory}</div> : <div className="divide-y">{history.map(h => (<div key={h.id} className="p-4 flex justify-between items-center"><div><p className="text-sm font-medium truncate max-w-">{h.preview}</p><p className="text- text-slate-400">{h.tab} • {h.date}</p></div><span className={`text-xs font-bold px-2.5 py-1 rounded-full ${h.score > 70? 'bg-red-100 text-red-700' : h.score > 40? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>{h.score}%</span></div>))}</div>}</div>)}
+        {activeSide === 'parametres' && (<div className="max-w- space-y-4"><div className={`rounded-2xl border p-6 md:p-8 ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white'}`}><h2 className="text-xl font-bold mb-6">{tr.parametres}</h2><div className="pb-6 border-b mb-6 flex justify-between items-center"><div><p className="font-semibold text-sm">{tr.planActuel}</p><p className="text-xs text-slate-500">Gratuit {analysesCount}/{FREE_LIMIT}</p></div><button onClick={handleUpgrade} className="h-10 px-5 rounded-xl bg-slate-900 text-white text-sm font-bold">{tr.upgrade}</button></div><div className="pb-6 border-b mb-6"><p className="font-semibold text-sm mb-3">🌐 {tr.langue}</p><div className="grid grid-cols-2 gap-3"><button onClick={() => setLang('fr')} className={`h- rounded-xl border-2 ${lang==='fr'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🇫🇷 Français</button><button onClick={() => setLang('en')} className={`h- rounded-xl border-2 ${lang==='en'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🇺🇸 English</button><button onClick={() => setLang('es')} className={`h- rounded-xl border-2 ${lang==='es'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🇪🇸 Español</button><button onClick={() => setLang('ar')} className={`h- rounded-xl border-2 ${lang==='ar'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🇸🇦 العربية</button></div></div><div className="pb-6 border-b mb-6"><p className="font-semibold text-sm mb-3">🎨 {tr.theme}</p><div className="grid grid-cols-2 gap-3"><button onClick={() => setTheme('clair')} className={`h- rounded-xl border-2 ${theme==='clair'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>☀️ Clair</button><button onClick={() => setTheme('sombre')} className={`h- rounded-xl border-2 ${theme==='sombre'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🌙 Sombre</button></div></div><div><p className="font-semibold text-sm mb-2">{tr.lienAbo}</p><p className="text- font-mono break-all bg-slate-50 p-3 rounded-xl border">{CHECKOUT}</p><a href={CHECKOUT} target="_blank" className="inline-flex mt-3 text-xs underline">{tr.gerer}</a><p className="text- text-slate-400 mt-4">{tr.support}</p></div></div></div>)}
+      </div></main>
+      {showPaywall && (<div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4"><div className="bg-white rounded- p-6 max-w-md w-full text-center shadow-2xl"><div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto text-2xl">🔒</div><h2 className="text-2xl font-bold mt-4">{tr.limite}</h2><p className="text-slate-500 mt-2 text-sm">{tr.limiteDesc}</p><button onClick={handleUpgrade} className="mt-6 w-full bg-slate-900 text-white py-4 rounded-2xl font-bold">{tr.debloquer}</button><button onClick={() => setShowPaywall(false)} className="mt-3 text-sm text-slate-400 underline">Fermer</button></div></div>)}
     </div>
   )
 }
