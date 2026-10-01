@@ -2,10 +2,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  (import.meta as any).env.VITE_SUPABASE_URL || '',
-  (import.meta as any).env.VITE_SUPABASE_ANON_KEY || ''
-)
+// CORRIGÉ: marche avec Vite ET Next.js
+const supabaseUrl = (typeof import.meta!== 'undefined'? (import.meta as any).env?.VITE_SUPABASE_URL : '') || (typeof process!== 'undefined'? (process as any).env?.NEXT_PUBLIC_SUPABASE_URL : '') || ''
+const supabaseKey = (typeof import.meta!== 'undefined'? (import.meta as any).env?.VITE_SUPABASE_ANON_KEY : '') || (typeof process!== 'undefined'? (process as any).env?.NEXT_PUBLIC_SUPABASE_ANON_KEY : '') || ''
+const supabase = createClient(supabaseUrl || 'https://placeholder.supabase.co', supabaseKey || 'placeholder')
 
 type TabType = 'Texte' | 'Vidéo' | 'Image' | 'Document' | 'Classeur' | 'Anti-Bypass'
 type SideType = 'detecteur' | 'historique' | 'parametres'
@@ -16,7 +16,7 @@ const CHECKOUT = "https://detectai-labs.lemonsqueezy.com/checkout/buy/09980aca-6
 
 const T = {
   fr: { title: "DetectAI", sub: "Version Mondiale • Honnête & Anonyme", detecteur: "Détecteur", historique: "Historique", parametres: "Paramètres", placeholder: "Colle ton texte ici...", analyses: "analyses restantes", sAbonner: "S'abonner - $9.99/mois", annulable: "Annulable", pro: "DetectAI Pro", mois: "Mensuel • $9.99", analyser: "Analyser", caracteres: "caractères", gratuitCount: "gratuit", proIllimite: "Pro illimité", langue: "Langue", theme: "Thème", clair: "Clair", sombre: "Sombre", planActuel: "Plan actuel", upgrade: "Upgrade $9.99", lienAbo: "Lien d'abonnement", gerer: "Gérer →", support: "Support: support@detectai-labs.com", videoDesc: "Dépose ta vidéo ici", imageDesc: "Dépose ton image ici", docDesc: "Dépose ton document ici", classeurDesc: "Dépose ton classeur ici", bypassDesc: "Teste les techniques", drop: "Glisse-dépose", limite: "Limite gratuite atteinte", limiteDesc: "Tu as utilisé tes 3 analyses gratuites.", debloquer: "Débloquer Pro - $9.99", connexion: "Connexion", deconnexion: "Déconnexion", email: "Email", mdp: "Mot de passe", seConnecter: "Se connecter", sinscrire: "S'inscrire", compte: "Mon compte" },
-  en: { title: "DetectAI", sub: "World Version • Honest & Anonymous", detecteur: "Detector", historique: "History", parametres: "Settings", placeholder: "Paste your text here...", analyses: "free left", sAbonner: "Subscribe - $9.99/month", annulable: "Cancelable", pro: "DetectAI Pro", mois: "Monthly • $9.99", analyser: "Analyze", caracteres: "characters", gratuitCount: "free", proIllimite: "Pro unlimited", langue: "Language", theme: "Theme", clair: "Light", sombre: "Dark", planActuel: "Current plan", upgrade: "Upgrade $9.99", lienAbo: "Subscription link", gerer: "Manage →", support: "Support", videoDesc: "Drop video", imageDesc: "Drop image", docDesc: "Drop doc", classeurDesc: "Drop workbook", bypassDesc: "Test bypass", drop: "Drag & drop", limite: "Free limit reached", limiteDesc: "You used 3 free analyses.", debloquer: "Unlock Pro", connexion: "Login", deconnexion: "Logout", email: "Email", mdp: "Password", seConnecter: "Login", sinscrire: "Sign up", compte: "My account" },
+  en: { title: "DetectAI", sub: "World Version", detecteur: "Detector", historique: "History", parametres: "Settings", placeholder: "Paste your text here...", analyses: "free left", sAbonner: "Subscribe - $9.99/month", annulable: "Cancelable", pro: "DetectAI Pro", mois: "Monthly • $9.99", analyser: "Analyze", caracteres: "characters", gratuitCount: "free", proIllimite: "Pro unlimited", langue: "Language", theme: "Theme", clair: "Light", sombre: "Dark", planActuel: "Current plan", upgrade: "Upgrade $9.99", lienAbo: "Subscription link", gerer: "Manage →", support: "Support", videoDesc: "Drop video", imageDesc: "Drop image", docDesc: "Drop doc", classeurDesc: "Drop workbook", bypassDesc: "Test bypass", drop: "Drag & drop", limite: "Free limit reached", limiteDesc: "You used 3 free analyses.", debloquer: "Unlock Pro", connexion: "Login", deconnexion: "Logout", email: "Email", mdp: "Password", seConnecter: "Login", sinscrire: "Sign up", compte: "My account" },
   es: { title: "DetectAI", sub: "Versión Mundial", detecteur: "Detector", historique: "Historial", parametres: "Ajustes", placeholder: "Pega tu texto aquí...", analyses: "restantes", sAbonner: "Suscribirse - $9.99/mes", annulable: "Cancelable", pro: "DetectAI Pro", mois: "Mensual • $9.99", analyser: "Analizar", caracteres: "caracteres", gratuitCount: "gratis", proIllimite: "Pro ilimitado", langue: "Idioma", theme: "Tema", clair: "Claro", sombre: "Oscuro", planActuel: "Plan actual", upgrade: "Mejorar $9.99", lienAbo: "Enlace", gerer: "Gestionar →", support: "Soporte", videoDesc: "Suelta video", imageDesc: "Suelta imagen", docDesc: "Suelta doc", classeurDesc: "Suelta libro", bypassDesc: "Prueba", drop: "Arrastra", limite: "Límite alcanzado", limiteDesc: "Usaste 3 gratis.", debloquer: "Desbloquear", connexion: "Conexión", deconnexion: "Desconexión", email: "Email", mdp: "Contraseña", seConnecter: "Conectar", sinscrire: "Registrarse", compte: "Mi cuenta" },
   ar: { title: "DetectAI", sub: "الإصدار العالمي", detecteur: "الكاشف", historique: "السجل", parametres: "الإعدادات", placeholder: "الصق النص هنا...", analyses: "متبقية", sAbonner: "اشترك - $9.99/شهر", annulable: "قابل للإلغاء", pro: "DetectAI Pro", mois: "شهري • $9.99", analyser: "حلل", caracteres: "حرف", gratuitCount: "مجاني", proIllimite: "Pro غير محدود", langue: "اللغة", theme: "المظهر", clair: "فاتح", sombre: "داكن", planActuel: "الخطة الحالية", upgrade: "ترقية $9.99", lienAbo: "رابط الاشتراك", gerer: "إدارة →", support: "الدعم", videoDesc: "أسقط الفيديو", imageDesc: "أسقط الصورة", docDesc: "أسقط المستند", classeurDesc: "أسقط المصنف", bypassDesc: "اختبر", drop: "اسحب", limite: "تم الوصول للحد", limiteDesc: "استخدمت 3 تحليلات.", debloquer: "فتح Pro", connexion: "تسجيل الدخول", deconnexion: "تسجيل الخروج", email: "البريد", mdp: "كلمة المرور", seConnecter: "دخول", sinscrire: "تسجيل", compte: "حسابي" }
 }
@@ -41,20 +41,26 @@ export default function App() {
   const fileRef = useRef<HTMLInputElement>(null)
   const tr = T[lang]
 
+  // SAUVEGARDE: charge au démarrage
   useEffect(() => {
     const savedCount = localStorage.getItem('detectai_count')
     if (savedCount) setAnalysesCount(parseInt(savedCount))
     const savedHist = localStorage.getItem('detectai_history')
-    if (savedHist) setHistory(JSON.parse(savedHist))
-    supabase.auth.getSession().then(({data})=> {
-      setUser(data.session?.user || null)
-      if(data.session?.user) loadHistory(data.session.user.id)
-    })
-    const {data: listener} = supabase.auth.onAuthStateChange((_, session)=>{
-      setUser(session?.user || null)
-      if(session?.user) loadHistory(session.user.id)
-    })
-    return ()=> listener.subscription.unsubscribe()
+    if (savedHist) {
+      try { setHistory(JSON.parse(savedHist)) } catch {}
+    }
+    // Auth Supabase
+    if (supabaseUrl && supabaseKey && supabaseUrl.includes('supabase')) {
+      supabase.auth.getSession().then(({data})=> {
+        setUser(data.session?.user || null)
+        if(data.session?.user) loadHistory(data.session.user.id)
+      })
+      const {data: listener} = supabase.auth.onAuthStateChange((_, session)=>{
+        setUser(session?.user || null)
+        if(session?.user) loadHistory(session.user.id)
+      })
+      return ()=> listener.subscription.unsubscribe()
+    }
   }, [])
 
   useEffect(() => {
@@ -66,7 +72,7 @@ export default function App() {
 
   const loadHistory = async (uid: string) => {
     const {data} = await supabase.from('analyses').select('*').eq('user_id', uid).order('created_at', {ascending:false}).limit(50)
-    if(data) setHistory(data)
+    if(data && data.length>0) setHistory(data)
   }
 
   const handleUpgrade = () => {
@@ -96,12 +102,16 @@ export default function App() {
     const newHist = [newResult,...history].slice(0,50)
     setHistory(newHist)
     localStorage.setItem('detectai_history', JSON.stringify(newHist))
-    if(user){
+    if(user && supabaseUrl.includes('supabase')){
       await supabase.from('analyses').insert({ user_id: user.id, content: input.slice(0,500), score: newResult.score, level, tab_type: activeTab })
     }
   }
 
   const handleAuth = async () => {
+    if(!supabaseUrl.includes('supabase')){
+      alert('Supabase non configuré dans Vercel! Va dans Vercel > Settings > Environment Variables et ajoute NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY')
+      return
+    }
     if(authMode==='signup'){
       const {error} = await supabase.auth.signUp({email, password})
       if(error) alert(error.message); else { alert('Compte créé! Vérifie ton email puis connecte-toi'); setShowAuth(false) }
