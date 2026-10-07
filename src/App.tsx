@@ -86,12 +86,18 @@ export default function App() {
     if (savedHist) setHistory(JSON.parse(savedHist))
     const savedLang = localStorage.getItem('detectai_lang') as LangType
     if (savedLang) setLanguage(savedLang)
+    const savedTheme = localStorage.getItem('detectai_theme')
+    if (savedTheme) setDarkMode(savedTheme === 'dark')
+    const savedPro = localStorage.getItem('detectai_pro')
+    if (savedPro) setIsPro(savedPro === 'true')
     supabase.auth.getSession().then(({ data: { session } }: any) => setUser(session?.user?? null))
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => { setUser(session?.user?? null); if (session?.user) setShowAuth(false) })
     return () => subscription.unsubscribe()
   }, [])
 
   useEffect(() => { localStorage.setItem('detectai_lang', language) }, [language])
+  useEffect(() => { localStorage.setItem('detectai_theme', darkMode? 'dark' : 'light') }, [darkMode])
+  useEffect(() => { localStorage.setItem('detectai_pro', isPro.toString()) }, [isPro])
 
   const handleAuth = async (e: any) => {
     e.preventDefault()
