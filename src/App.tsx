@@ -76,6 +76,13 @@ export default function App() {
   const t = translations[language]
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('paid') === '1' || params.get('pro') === '1' || params.get('success') === '1') {
+      setIsPro(true)
+      localStorage.setItem('detectai_pro', 'true')
+      alert('Merci! DetectAI Pro activé - Accès illimité débloqué!')
+      window.history.replaceState({}, '', window.location.pathname)
+    }
     const saved = localStorage.getItem('detectai_count')
     if (saved) setAnalysesCount(parseInt(saved))
     const savedHist = localStorage.getItem('detectai_hist')
