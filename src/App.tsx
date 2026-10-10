@@ -20,7 +20,6 @@ import {
   ArrowRight,
   AlertCircle
 } from 'lucide-react';
-import { Analytics } from '@vercel/analytics/react';
 
 // Types
 type TabType = 'texte' | 'video' | 'image' | 'document' | 'classeur' | 'anti-bypass';
@@ -680,7 +679,6 @@ export default function DetectAI() {
         </div>
       )}
 
-      <Analytics />
       <style>{`
         @keyframes in { from { transform: translateY(8px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
         .scrollbar-none::-webkit-scrollbar { display: none; }
