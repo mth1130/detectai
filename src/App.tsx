@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { Analytics } from '@vercel/analytics/react'
 
 const supabaseUrl = (typeof import.meta!== 'undefined' && (import.meta as any).env?.VITE_SUPABASE_URL) || 'https://gostyskhyzhgrsrbbgfu.supabase.co'
 const supabaseKey = (typeof import.meta!== 'undefined' && ((import.meta as any).env?.VITE_SUPABASE_ANON_KEY || (import.meta as any).env?.NEXT_PUBLIC_SUPABASE_ANON_KEY)) || ''
@@ -220,6 +221,7 @@ export default function App() {
       </div>
       {showAuth && <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-[100] p-4"><div className="w-full max-w- rounded- border border-[#1e1c24] bg-[#0f0e12] p-1.5"><div className="rounded- bg-[#08070a] p-6"><div className="flex items-center gap-3 mb-6"><div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center font-black text-white">D</div><div><p className="font-bold text-sm">{authMode==='login'? t.loginTitle : t.signupTitle}</p><p className="text- text-zinc-500">DetectAI</p></div><button onClick={()=>setShowAuth(false)} className="ml-auto w-7 h-7 rounded-full bg-[#1e1c24] flex items-center justify-center text-zinc-500">✕</button></div><form onSubmit={handleAuth} className="space-y-3"><input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" className="w-full px-4 py-3 rounded-xl bg-[#0f0e12] border border-[#1e1c24] text-sm outline-none focus:border-[#2a2832]" /><input type="password" required value={password} onChange={e=>setPassword(e.target.value)} placeholder="Mot de passe" className="w-full px-4 py-3 rounded-xl bg-[#0f0e12] border border-[#1e1c24] text-sm outline-none focus:border-[#2a2832]" /><button type="submit" className="w-full bg-white text-black py-3 rounded-xl font-bold text-sm hover:bg-zinc-100">{authMode==='login'? t.loginBtn : t.signupBtn}</button></form><p className="text- text-zinc-600 mt-4 text-center">{authMode==='login'? t.noAccount : t.haveAccount} <button onClick={()=>setAuthMode(authMode==='login'? 'signup' : 'login')} className="text-white font-medium">{authMode==='login'? t.signup : t.login}</button></p></div></div></div>}
       {showPaywall && <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-50 p-4"><div className="rounded- border border-[#1e1c24] bg-[#0f0e12] p-1.5 max-w- w-full"><div className="rounded- bg-[#08070a] p-6 text-center"><div className="w-12 h-12 rounded-xl bg-white text-black flex items-center justify-center mx-auto font-bold">D</div><h2 className="text- font-bold mt-4">{t.pro}</h2><p className="text-zinc-500 mt-2 text-">Analyses illimitées • 6 modes • $9.99/mois</p><button onClick={handleUpgrade} className="mt-6 w-full bg-white text-black py-3 rounded-full font-bold text-sm hover:bg-zinc-100">{t.subscribe}</button><button onClick={()=>setShowPaywall(false)} className="mt-3 text-xs text-zinc-600">{t.close}</button></div></div></div>}
+      <Analytics />
     </div>
   )
 }
