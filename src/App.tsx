@@ -12,10 +12,14 @@ type NavType = 'detecteur' | 'historique' | 'parametres'
 type LangType = 'fr' | 'en' | 'es' | 'ar'
 
 const translations: any = {
-  fr: { detector: 'Détecteur', history: 'Historique', settings: 'Paramètres', free: 'gratuit', analyze: 'Analyser', analysing: 'Analyse...', chars: 'caractères', remaining: 'restantes', upgradeBtn: 'Passer Pro - $9.99', noHistory: 'Aucune analyse', login: 'Connexion', signup: 'Inscription', logout: 'Déconnexion', email: 'Email', password: 'Mot de passe', loginTitle: 'Bienvenue', signupTitle: 'Créer un compte', loginBtn: 'Se connecter', signupBtn: "S'inscrire", haveAccount: 'Déjà un compte?', noAccount: 'Pas de compte?', language: 'Langue', theme: 'Thème', light: 'Clair', dark: 'Sombre', choose: 'Choisir un fichier', antiBypass: 'Anti-Bypass', currentPlan: 'Plan actuel', subLink: "Lien d'abonnement", payment: 'Paiement', reset: 'Réinitialiser', subscribe: "S'abonner - $9.99/mois", close: 'Fermer', pro: 'DetectAI Pro', reading: 'Lecture du fichier...', extracted: 'Contenu extrait' },
-  en: { detector: 'Detector', history: 'History', settings: 'Settings', free: 'free', analyze: 'Analyze', analysing: 'Analyzing...', chars: 'chars', remaining: 'remaining', upgradeBtn: 'Go Pro - $9.99', noHistory: 'No analysis', login: 'Login', signup: 'Sign up', logout: 'Logout', email: 'Email', password: 'Password', loginTitle: 'Welcome', signupTitle: 'Create account', loginBtn: 'Login', signupBtn: 'Sign up', haveAccount: 'Have account?', noAccount: 'No account?', language: 'Language', theme: 'Theme', light: 'Light', dark: 'Dark', choose: 'Choose file', antiBypass: 'Anti-Bypass', currentPlan: 'Current plan', subLink: 'Subscription link', payment: 'Payment', reset: 'Reset', subscribe: 'Subscribe - $9.99/mo', close: 'Close', pro: 'DetectAI Pro', reading: 'Reading file...', extracted: 'Extracted content' },
-  es: { detector: 'Detector', history: 'Historial', settings: 'Ajustes', free: 'gratis', analyze: 'Analizar', analysing: 'Analizando...', chars: 'caracteres', remaining: 'restantes', upgradeBtn: 'Pasa a Pro - $9.99', noHistory: 'Sin análisis', login: 'Login', signup: 'Registro', logout: 'Salir', email: 'Email', password: 'Contraseña', loginTitle: 'Bienvenido', signupTitle: 'Crear cuenta', loginBtn: 'Entrar', signupBtn: 'Registrarse', haveAccount: '¿Tienes cuenta?', noAccount: '¿No tienes?', language: 'Idioma', theme: 'Tema', light: 'Claro', dark: 'Oscuro', choose: 'Elegir', antiBypass: 'Anti-Bypass', currentPlan: 'Plan actual', subLink: 'Enlace', payment: 'Pago', reset: 'Reiniciar', subscribe: 'Suscribirse - $9.99/mes', close: 'Cerrar', pro: 'DetectAI Pro', reading: 'Leyendo...', extracted: 'Contenido extraído' },
-  ar: { detector: 'كاشف', history: 'السجل', settings: 'الإعدادات', free: 'مجاني', analyze: 'تحليل', analysing: 'جار التحليل...', chars: 'حرف', remaining: 'متبقية', upgradeBtn: 'ترقية - $9.99', noHistory: 'لا يوجد', login: 'دخول', signup: 'حساب', logout: 'خروج', email: 'البريد', password: 'كلمة المرور', loginTitle: 'مرحبا', signupTitle: 'إنشاء', loginBtn: 'دخول', signupBtn: 'إنشاء', haveAccount: 'لديك حساب؟', noAccount: 'ليس لديك؟', language: 'اللغة', theme: 'المظهر', light: 'فاتح', dark: 'داكن', choose: 'اختر', antiBypass: 'مكافحة', currentPlan: 'الخطة الحالية', subLink: 'رابط الاشتراك', payment: 'الدفع', reset: 'إعادة تعيين', subscribe: 'اشترك - $9.99', close: 'إغلاق', pro: 'DetectAI برو', reading: 'جاري القراءة...', extracted: 'المحتوى المستخرج' },
+  fr: { detector: 'Détecteur', history: 'Historique', settings: 'Paramètres', free: 'gratuit', analyze: 'Analyser', analysing: 'Analyse...', chars: 'caractères', remaining: 'restantes', upgradeBtn: 'Passer Pro - $9.99', noHistory: 'Aucune analyse', login: 'Connexion', signup: 'Inscription', logout: 'Déconnexion', email: 'Email', password: 'Mot de passe', loginTitle: 'Bienvenue', signupTitle: 'Créer un compte', loginBtn: 'Se connecter', signupBtn: "S'inscrire", haveAccount: 'Déjà un compte?', noAccount: 'Pas de compte?', language: 'Langue', theme: 'Thème', light: 'Clair', dark: 'Sombre', choose: 'Choisir un fichier', antiBypass: 'Anti-Bypass', currentPlan: 'Plan actuel', subLink: "Lien d'abonnement", payment: 'Paiement', reset: 'Réinitialiser', subscribe: "S'abonner - $9.99/mois", close: 'Fermer', pro: 'DetectAI Pro', reading: 'Lecture du fichier...', extracted: 'Contenu extrait',
+    heroTitle: 'Détecte l\'IA.', heroSub: 'En 2 secondes.', heroDesc: 'Le seul détecteur entraîné sur le style africain. Texte, Vidéo, Image, Document, Excel et Anti-Bypass. Honnête, anonyme et ultra-rapide.', tryFree: 'Essayer gratuitement →', howItWorks: 'Comment ça marche', step1: 'Dépose', step1Desc: 'Colle ton texte ou dépose ton fichier (PDF, DOCX, JPG, MP4, XLSX)', step2: 'Analyse', step2Desc: 'Notre IA analyse perplexité, burstiness et patterns IA en 2s', step3: 'Résultat', step3Desc: 'Score fiable + raisons + phrases IA détectées', features: '6 modes de détection', whyTitle: 'Pourquoi DetectAI est différent', why1: 'Entraîné sur style sénégalais', why1Desc: 'Détecte "à Mbour", "à Dakar", "Mon stage à Malicounda" - les autres outils échouent', why2: 'Anti-Bypass réel', why2Desc: 'Détecte Quillbot, Undetectable AI, paraphrasage que ZeroGPT ne voit pas', why3: '6 modes vs 1', why3Desc: 'Seul outil qui analyse Vidéo, Image, Document, Classeur en plus du Texte', pricing: 'Tarif unique', pricingDesc: 'Accès illimité • Tous les modes • Annulable', perMonth: '6000F / $9.99 par mois', payMethods: 'PayDunya • Wave • Orange Money • Visa', startNow: 'Commencer maintenant', faq: 'FAQ', faq1Q: 'C\'est anonyme ?', faq1A: 'Oui 100% anonyme. On ne stocke pas ton texte. Historique local uniquement.', faq2Q: 'Quelle fiabilité ?', faq2A: '85-95% sur textes >70 mots. On t\'explique pourquoi (perplexité, burstiness, transitions IA).', faq3Q: 'Différence avec Turnitin / ZeroGPT ?', faq3A: 'Turnitin = plagiat. ZeroGPT = texte anglais uniquement. DetectAI = style africain + 6 modes + anti-bypass.', ctaTitle: 'Prêt à détecter l\'IA ?', ctaDesc: '3 analyses gratuites. Sans carte bancaire.', ctaBtn: 'Lancer DetectAI →' },
+  en: { detector: 'Detector', history: 'History', settings: 'Settings', free: 'free', analyze: 'Analyze', analysing: 'Analyzing...', chars: 'chars', remaining: 'remaining', upgradeBtn: 'Go Pro - $9.99', noHistory: 'No analysis', login: 'Login', signup: 'Sign up', logout: 'Logout', email: 'Email', password: 'Password', loginTitle: 'Welcome', signupTitle: 'Create account', loginBtn: 'Login', signupBtn: 'Sign up', haveAccount: 'Have account?', noAccount: 'No account?', language: 'Language', theme: 'Theme', light: 'Light', dark: 'Dark', choose: 'Choose file', antiBypass: 'Anti-Bypass', currentPlan: 'Current plan', subLink: 'Subscription link', payment: 'Payment', reset: 'Reset', subscribe: 'Subscribe - $9.99/mo', close: 'Close', pro: 'DetectAI Pro', reading: 'Reading file...', extracted: 'Extracted content',
+    heroTitle: 'Detect AI.', heroSub: 'In 2 seconds.', heroDesc: 'The only detector trained on African style. Text, Video, Image, Document, Excel and Anti-Bypass. Honest, anonymous and ultra-fast.', tryFree: 'Try for free →', howItWorks: 'How it works', step1: 'Drop', step1Desc: 'Paste text or drop file (PDF, DOCX, JPG, MP4, XLSX)', step2: 'Analyze', step2Desc: 'Our AI analyzes perplexity, burstiness and AI patterns in 2s', step3: 'Result', step3Desc: 'Reliable score + reasons + AI phrases detected', features: '6 detection modes', whyTitle: 'Why DetectAI is different', why1: 'Trained on Senegalese style', why1Desc: 'Detects local expressions other tools miss', why2: 'Real Anti-Bypass', why2Desc: 'Detects Quillbot, Undetectable AI', why3: '6 modes vs 1', why3Desc: 'Only tool analyzing Video, Image, Document, Workbook plus Text', pricing: 'Simple pricing', pricingDesc: 'Unlimited access • All modes • Cancel anytime', perMonth: '6000F / $9.99 per month', payMethods: 'PayDunya • Wave • Orange Money • Visa', startNow: 'Start now', faq: 'FAQ', faq1Q: 'Is it anonymous?', faq1A: 'Yes 100% anonymous.', faq2Q: 'How reliable?', faq2A: '85-95% on texts >70 words.', faq3Q: 'Difference vs Turnitin?', faq3A: 'Turnitin = plagiarism. DetectAI = African style + 6 modes.', ctaTitle: 'Ready to detect AI?', ctaDesc: '3 free analyses. No credit card.', ctaBtn: 'Launch DetectAI →' },
+  es: { detector: 'Detector', history: 'Historial', settings: 'Ajustes', free: 'gratis', analyze: 'Analizar', analysing: 'Analizando...', chars: 'caracteres', remaining: 'restantes', upgradeBtn: 'Pasa a Pro - $9.99', noHistory: 'Sin análisis', login: 'Login', signup: 'Registro', logout: 'Salir', email: 'Email', password: 'Contraseña', loginTitle: 'Bienvenido', signupTitle: 'Crear cuenta', loginBtn: 'Entrar', signupBtn: 'Registrarse', haveAccount: '¿Tienes cuenta?', noAccount: '¿No tienes?', language: 'Idioma', theme: 'Tema', light: 'Claro', dark: 'Oscuro', choose: 'Elegir', antiBypass: 'Anti-Bypass', currentPlan: 'Plan actual', subLink: 'Enlace', payment: 'Pago', reset: 'Reiniciar', subscribe: 'Suscribirse - $9.99/mes', close: 'Cerrar', pro: 'DetectAI Pro', reading: 'Leyendo...', extracted: 'Contenido extraído',
+    heroTitle: 'Detecta IA.', heroSub: 'En 2 segundos.', heroDesc: 'El único detector entrenado en estilo africano.', tryFree: 'Probar gratis →', howItWorks: 'Cómo funciona', step1: 'Suelta', step1Desc: 'Pega texto o archivo', step2: 'Analiza', step2Desc: 'Analiza perplejidad y patrones', step3: 'Resultado', step3Desc: 'Puntuación fiable', features: '6 modos', whyTitle: 'Por qué DetectAI es diferente', why1: 'Estilo senegalés', why1Desc: 'Detecta expresiones locales', why2: 'Anti-Bypass real', why2Desc: 'Detecta Quillbot', why3: '6 modos vs 1', why3Desc: 'Único con Video, Imagen, etc.', pricing: 'Tarifa única', pricingDesc: 'Acceso ilimitado', perMonth: '6000F / $9.99 por mes', payMethods: 'PayDunya • Wave • OM • Visa', startNow: 'Empezar ahora', faq: 'FAQ', faq1Q: '¿Es anónimo?', faq1A: 'Sí 100% anónimo.', faq2Q: '¿Fiabilidad?', faq2A: '85-95% en textos >70 palabras.', faq3Q: '¿Diferencia vs Turnitin?', faq3A: 'DetectAI = estilo africano + 6 modos.', ctaTitle: '¿Listo para detectar IA?', ctaDesc: '3 análisis gratis.', ctaBtn: 'Lanzar DetectAI →' },
+  ar: { detector: 'كاشف', history: 'السجل', settings: 'الإعدادات', free: 'مجاني', analyze: 'تحليل', analysing: 'جار التحليل...', chars: 'حرف', remaining: 'متبقية', upgradeBtn: 'ترقية - $9.99', noHistory: 'لا يوجد', login: 'دخول', signup: 'حساب', logout: 'خروج', email: 'البريد', password: 'كلمة المرور', loginTitle: 'مرحبا', signupTitle: 'إنشاء', loginBtn: 'دخول', signupBtn: 'إنشاء', haveAccount: 'لديك حساب؟', noAccount: 'ليس لديك؟', language: 'اللغة', theme: 'المظهر', light: 'فاتح', dark: 'داكن', choose: 'اختر', antiBypass: 'مكافحة', currentPlan: 'الخطة الحالية', subLink: 'رابط الاشتراك', payment: 'الدفع', reset: 'إعادة تعيين', subscribe: 'اشترك - $9.99', close: 'إغلاق', pro: 'DetectAI برو', reading: 'جاري القراءة...', extracted: 'المحتوى المستخرج',
+    heroTitle: 'اكتشف الذكاء الاصطناعي.', heroSub: 'في ثانيتين.', heroDesc: 'الكاشف الوحيد المدرب على الأسلوب الأفريقي.', tryFree: 'جرب مجانا →', howItWorks: 'كيف يعمل', step1: 'أسقط', step1Desc: 'الصق النص أو الملف', step2: 'حلل', step2Desc: 'يحلل الحيرة والأنماط', step3: 'نتيجة', step3Desc: 'نتيجة موثوقة', features: '6 أوضاع', whyTitle: 'لماذا DetectAI مختلف', why1: 'أسلوب سنغالي', why1Desc: 'يكتشف تعبيرات محلية', why2: 'مكافحة حقيقية', why2Desc: 'يكتشف Quillbot', why3: '6 أوضاع مقابل 1', why3Desc: 'الوحيد مع فيديو وصورة', pricing: 'سعر واحد', pricingDesc: 'وصول غير محدود', perMonth: '6000F / $9.99 شهريا', payMethods: 'PayDunya • Wave • OM • Visa', startNow: 'ابدأ الآن', faq: 'الأسئلة', faq1Q: 'هل هو مجهول؟', faq1A: 'نعم 100% مجهول.', faq2Q: 'الموثوقية؟', faq2A: '85-95% على نصوص >70 كلمة.', faq3Q: 'الفرق مع Turnitin؟', faq3A: 'DetectAI = أسلوب أفريقي + 6 أوضاع.', ctaTitle: 'جاهز لاكتشاف الذكاء الاصطناعي؟', ctaDesc: '3 تحليلات مجانية.', ctaBtn: 'إطلاق DetectAI →' },
 }
 
 const tabIcons: any = { 'Texte': '📝', 'Vidéo': '🎬', 'Image': '🖼', 'Document': '📄', 'Classeur': '📊', 'Anti-Bypass': '🛡' }
@@ -53,6 +57,7 @@ function calculateAIScore(text: string): number {
 }
 
 export default function App() {
+  const [showLanding, setShowLanding] = useState(true)
   const [input, setInput] = useState('')
   const [fileName, setFileName] = useState('')
   const [result, setResult] = useState<any>(null)
@@ -78,12 +83,17 @@ export default function App() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
+    if (params.get('app') === '1' || params.get('paid') === '1' || params.get('pro') === '1') {
+      setShowLanding(false)
+    }
     if (params.get('paid') === '1' || params.get('pro') === '1' || params.get('success') === '1') {
       setIsPro(true)
       localStorage.setItem('detectai_pro', 'true')
       alert('Merci! DetectAI Pro activé - Accès illimité débloqué!')
-      window.history.replaceState({}, '', window.location.pathname)
+      window.history.replaceState({}, '', window.location.pathname + '?app=1')
     }
+    const savedLanding = localStorage.getItem('detectai_seen_landing')
+    if (savedLanding) setShowLanding(false)
     const saved = localStorage.getItem('detectai_count')
     if (saved) setAnalysesCount(parseInt(saved))
     const savedHist = localStorage.getItem('detectai_hist')
@@ -102,6 +112,12 @@ export default function App() {
   useEffect(() => { localStorage.setItem('detectai_lang', language) }, [language])
   useEffect(() => { localStorage.setItem('detectai_theme', darkMode? 'dark' : 'light') }, [darkMode])
   useEffect(() => { localStorage.setItem('detectai_pro', isPro.toString()) }, [isPro])
+
+  const enterApp = () => {
+    setShowLanding(false)
+    localStorage.setItem('detectai_seen_landing', 'true')
+    window.scrollTo(0,0)
+  }
 
   const handleAuth = async (e: any) => {
     e.preventDefault()
@@ -127,25 +143,13 @@ export default function App() {
     const ext = file.name.split('.').pop()?.toLowerCase() || ''
     if (ext === 'txt' || ext === 'csv') {
       const reader = new FileReader()
-      reader.onload = (ev) => {
-        const content = ev.target?.result as string
-        setInput(content)
-      }
+      reader.onload = (ev) => { const content = ev.target?.result as string; setInput(content) }
       reader.readAsText(file)
       return
     }
-    if (ext === 'pdf') {
-      setInput(`${t.reading} PDF: ${file.name} (${Math.round(file.size/1024)} Ko) - Le contenu sera extrait automatiquement. Pour l'instant colle le texte manuellement ou passe en TXT.`)
-      return
-    }
-    if (ext === 'docx' || ext === 'doc') {
-      setInput(`${t.reading} DOCX: ${file.name} (${Math.round(file.size/1024)} Ko) - Extraction DOCX bientôt. Pour l'instant colle le texte ou exporte en TXT.`)
-      return
-    }
-    if (ext === 'xlsx' || ext === 'xls') {
-      setInput(`${t.reading} Classeur: ${file.name} (${Math.round(file.size/1024)} Ko) - Extraction Excel bientôt. Pour l'instant exporte en CSV pour lecture directe.`)
-      return
-    }
+    if (ext === 'pdf') { setInput(`${t.reading} PDF: ${file.name} (${Math.round(file.size/1024)} Ko) - Le contenu sera extrait automatiquement. Pour l'instant colle le texte manuellement ou passe en TXT.`); return }
+    if (ext === 'docx' || ext === 'doc') { setInput(`${t.reading} DOCX: ${file.name} (${Math.round(file.size/1024)} Ko) - Extraction DOCX bientôt. Pour l'instant colle le texte ou exporte en TXT.`); return }
+    if (ext === 'xlsx' || ext === 'xls') { setInput(`${t.reading} Classeur: ${file.name} (${Math.round(file.size/1024)} Ko) - Extraction Excel bientôt. Pour l'instant exporte en CSV pour lecture directe.`); return }
     setInput(`Fichier: ${file.name} (${Math.round(file.size/1024)} Ko) - ${t.extracted}`)
   }
 
@@ -167,6 +171,122 @@ export default function App() {
     }, 1500)
   }
 
+  if (showLanding) {
+    return (
+      <div className={`min-h-screen ${darkMode? 'bg-[#08070a] text-white' : 'bg-[#f8f7ff] text-zinc-900'} flex flex-col`}>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@400&display=swap'); *{font-family:'Geist', sans-serif}.mono{font-family:'Geist Mono', monospace}`}</style>
+        <header className={`sticky top-0 z-30 backdrop-blur-xl border-b ${darkMode? 'bg-[#08070a]/80 border-[#1e1c24]' : 'bg-white/80 border-violet-100'} px-6 py-3.5 flex items-center justify-between`}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-violet-700 flex items-center justify-center font-black text-white">D</div>
+            <p className="font-bold tracking-tight">DETECTAI</p>
+            <span className="ml-2 text-[10px] px-2 py-0.5 rounded-full bg-violet-600 text-white mono">BETA</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="hidden md:flex gap-1 mr-2">
+              {['fr','en','es','ar'].map(l=><button key={l} onClick={()=>setLanguage(l as LangType)} className={`w-8 h-8 rounded-full text-[11px] ${language===l? 'bg-white text-black' : 'bg-[#16141c] text-zinc-500'}`}>{l.toUpperCase()}</button>)}
+            </div>
+            <button onClick={enterApp} className="px-4 py-2 rounded-full text-xs font-medium border border-[#1e1c24] bg-[#16141c]">Détecteur</button>
+            <button onClick={enterApp} className="px-4 py-2 rounded-full text-xs font-bold bg-white text-black">{t.tryFree}</button>
+          </div>
+        </header>
+
+        <section className="px-6 md:px-10 py-16 md:py-24 max-w-6xl mx-auto w-full">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#16141c] border border-[#1e1c24] text-[11px] text-zinc-400 mono mb-6"><span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> 6 modes • Anti-Bypass • PayDunya 6000F</div>
+            <h1 className="text-5xl md:text-7xl font-bold tracking-[-0.04em] leading-[0.9]">{t.heroTitle}<br/><span className="text-zinc-500">{t.heroSub}</span></h1>
+            <p className="text-lg md:text-xl text-zinc-400 mt-6 leading-relaxed max-w-2xl">{t.heroDesc}</p>
+            <div className="flex flex-wrap gap-3 mt-8">
+              <button onClick={enterApp} className="px-7 py-3.5 rounded-full bg-white text-black font-bold text-sm hover:bg-zinc-100 flex items-center gap-2">{t.tryFree} <span>↗</span></button>
+              <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-[#0f0e12] border border-[#1e1c24] text-xs text-zinc-500"><span className="flex -space-x-1"><span className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center text-[10px] text-white">A</span><span className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] text-white">B</span><span className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[10px]">+2k</span></span> 3 analyses gratuites • Sans CB</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-16">
+            {(Object.keys(tabIcons) as TabType[]).map(tab=>(
+              <div key={tab} className="rounded-2xl bg-[#0f0e12] border border-[#1e1c24] p-4">
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tabColors[tab]} flex items-center justify-center text-white mb-3`}>{tabIcons[tab]}</div>
+                <p className="font-medium text-sm">{tab}</p>
+                <p className="text-[11px] text-zinc-500 mt-1">{tab==='Texte'?'ChatGPT, Claude, Gemini':tab==='Vidéo'?'Deepfake, Sora':tab==='Image'?'Midjourney, DALL·E':tab==='Document'?'PDF, DOCX, TXT':tab==='Classeur'?'XLSX, CSV, Excel':'Quillbot, Undetectable'}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="px-6 md:px-10 py-16 bg-[#0f0e12] border-y border-[#1e1c24]">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{t.howItWorks}</h2>
+            <div className="grid md:grid-cols-3 gap-6 mt-10">
+              {[
+                {n:'01', t:t.step1, d:t.step1Desc, c:'from-violet-500 to-indigo-500'},
+                {n:'02', t:t.step2, d:t.step2Desc, c:'from-fuchsia-500 to-pink-500'},
+                {n:'03', t:t.step3, d:t.step3Desc, c:'from-emerald-500 to-teal-500'},
+              ].map(s=>(
+                <div key={s.n} className="rounded-2xl bg-[#08070a] border border-[#1e1c24] p-6">
+                  <div className="flex items-center gap-3"><span className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.c} flex items-center justify-center text-xs font-bold text-white`}>{s.n}</span><p className="font-bold">{s.t}</p></div>
+                  <p className="text-sm text-zinc-500 mt-4 leading-relaxed">{s.d}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-6 md:px-10 py-16 max-w-6xl mx-auto w-full">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{t.whyTitle}</h2>
+          <div className="grid md:grid-cols-3 gap-6 mt-10">
+            <div className="rounded-2xl bg-[#0f0e12] border border-[#1e1c24] p-6"><div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-xl">🇸🇳</div><h3 className="font-bold mt-4">{t.why1}</h3><p className="text-sm text-zinc-500 mt-2 leading-relaxed">{t.why1Desc}</p></div>
+            <div className="rounded-2xl bg-[#0f0e12] border border-[#1e1c24] p-6"><div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-xl">🛡️</div><h3 className="font-bold mt-4">{t.why2}</h3><p className="text-sm text-zinc-500 mt-2 leading-relaxed">{t.why2Desc}</p></div>
+            <div className="rounded-2xl bg-[#0f0e12] border border-[#1e1c24] p-6"><div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-xl">📦</div><h3 className="font-bold mt-4">{t.why3}</h3><p className="text-sm text-zinc-500 mt-2 leading-relaxed">{t.why3Desc}</p></div>
+          </div>
+        </section>
+
+        <section className="px-6 md:px-10 py-16 bg-[#0f0e12] border-y border-[#1e1c24]">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">{t.pricing}</h2>
+            <p className="text-zinc-500 mt-3">{t.pricingDesc}</p>
+            <div className="mt-10 rounded-[24px] bg-[#08070a] border border-[#1e1c24] p-1.5 max-w-md mx-auto">
+              <div className="rounded-[20px] bg-gradient-to-br from-[#16141c] to-[#0f0e12] border border-[#1e1c24] p-8">
+                <p className="text-sm font-bold tracking-widest mono text-zinc-500">DETECTAI PRO</p>
+                <p className="text-5xl font-bold mt-4">$9.99<span className="text-lg font-normal text-zinc-500"> / {t.perMonth.split('/')[0].trim()}</span></p>
+                <p className="text-sm text-zinc-500 mt-1">6000F • {t.payMethods}</p>
+                <div className="text-left mt-8 space-y-3 text-sm">
+                  {['✓ Analyses illimitées','✓ 6 modes (Texte, Vidéo, Image, Document, Classeur, Anti-Bypass)','✓ Historique illimité','✓ Support prioritaire','✓ Annulable à tout moment'].map(l=><p key={l} className="flex gap-2 text-zinc-300"><span className="text-emerald-500">{l.split(' ')[0]}</span> {l.slice(2)}</p>)}
+                </div>
+                <button onClick={()=>window.open(CHECKOUT_URL,'_blank')} className="mt-8 w-full py-3.5 rounded-full bg-white text-black font-bold text-sm hover:bg-zinc-100">{t.startNow} - {t.perMonth}</button>
+                <p className="text-[11px] text-zinc-600 mt-3 mono">PayDunya • Djemnaba Djigo • Wave, OM, Visa</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="px-6 md:px-10 py-16 max-w-3xl mx-auto w-full">
+          <h2 className="text-3xl font-bold tracking-tight">{t.faq}</h2>
+          <div className="mt-8 divide-y divide-[#1e1c24] border-y border-[#1e1c24]">
+            {[
+              {q:t.faq1Q, a:t.faq1A},
+              {q:t.faq2Q, a:t.faq2A},
+              {q:t.faq3Q, a:t.faq3A},
+            ].map(f=>(
+              <div key={f.q} className="py-5"><p className="font-medium">{f.q}</p><p className="text-sm text-zinc-500 mt-2 leading-relaxed">{f.a}</p></div>
+            ))}
+          </div>
+        </section>
+
+        <section className="px-6 md:px-10 py-16 bg-[#0f0e12] border-t border-[#1e1c24]">
+          <div className="max-w-4xl mx-auto rounded-[24px] bg-gradient-to-br from-violet-600 via-indigo-600 to-violet-700 p-[1px]">
+            <div className="rounded-[23px] bg-[#08070a] p-10 md:p-14 text-center">
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight">{t.ctaTitle}</h2>
+              <p className="text-zinc-400 mt-3">{t.ctaDesc}</p>
+              <button onClick={enterApp} className="mt-8 px-8 py-3.5 rounded-full bg-white text-black font-bold text-sm hover:bg-zinc-100">{t.ctaBtn}</button>
+              <p className="text-[11px] text-zinc-600 mt-4 mono">support@detectai-labs.com • PayDunya 6000F • $9.99</p>
+            </div>
+          </div>
+          <p className="text-center text-[11px] text-zinc-600 mt-10 mono">© 2026 DetectAI • Fait au Sénégal 🇸🇳 • PayDunya • Tous droits réservés</p>
+        </section>
+        <Analytics />
+      </div>
+    )
+  }
+
   return (
     <div className={`min-h-screen ${darkMode? 'bg-[#08070a] text-white' : 'bg-[#f8f7ff] text-zinc-900'} flex flex-col`}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@400&display=swap'); *{font-family:'Geist', sans-serif}.mono{font-family:'Geist Mono', monospace}.scrollbar-hide::-webkit-scrollbar{display:none}.scrollbar-hide{-ms-overflow-style:none; scrollbar-width:none}`}</style>
@@ -177,6 +297,7 @@ export default function App() {
           <div className="flex items-center gap-3">
             <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-violet-700 flex items-center justify-center font-black text-white shadow-lg shadow-violet-600/25 ring-1 ring-white/10"><span className="text- tracking-tight">D</span><div className="absolute inset-0 rounded-xl bg-gradient-to-tr from-white/20 to-transparent"></div></div>
             <div><p className="font-bold text- leading-none tracking-tight">DETECTAI</p></div>
+            <button onClick={()=>setShowLanding(true)} className="ml-2 hidden md:block text-[10px] px-2 py-0.5 rounded-full bg-[#16141c] border border-[#1e1c24] text-zinc-500">← Accueil</button>
           </div>
         </div>
         <div className="flex items-center gap-2.5">
