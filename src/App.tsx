@@ -1,696 +1,252 @@
 'use client'
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  Search, 
-  History, 
-  Settings, 
-  FileText, 
-  Video, 
-  Image as ImageIcon, 
-  FileCheck, 
-  FolderOpen, 
-  ShieldCheck,
-  Sparkles,
-  Upload,
-  X,
-  Lock,
-  Check,
-  Crown,
-  Zap,
-  ArrowRight,
-  AlertCircle
-} from 'lucide-react';
+import { useState, useEffect, useRef } from 'react'
+import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
 
-// Types
-type TabType = 'texte' | 'video' | 'image' | 'document' | 'classeur' | 'anti-bypass';
-type SidebarType = 'detecteur' | 'historique' | 'parametres';
+type TabType = 'Texte' | 'Vidéo' | 'Image' | 'Document' | 'Classeur' | 'Anti-Bypass'
+type SideType = 'detecteur' | 'historique' | 'parametres'
+type LangType = 'fr' | 'en' | 'es' | 'ar'
 
-interface Analyse {
-  id: string;
-  type: TabType;
-  content: string;
-  result: number; // 0-100 % IA
-  date: string;
-  isHuman: boolean;
+const FREE_LIMIT = 3
+const CHECKOUT = "https://detectai-labs.lemonsqueezy.com/checkout/buy/09980aca-6baa-4075-8917-7b2766dc6210?checkout[custom][user_email]="
+
+const T = {
+  fr: { title: "DetectAI", sub: "Version Mondiale • Honnête & Anonyme • Texte, Image, Vidéo, Document, Classeur", detecteur: "Détecteur", historique: "Historique", parametres: "Paramètres", placeholder: "Colle ton texte ici (minimum 50 caractères pour une analyse fiable)...", analyses: "analyses gratuites restantes", sAbonner: "S'abonner - $9.99/mois", annulable: "Annulable • Payoneer", pro: "DetectAI Pro", mois: "Abonnement mensuel • $9.99", analyser: "Analyser", caracteres: "caractères", gratuitCount: "gratuit", proIllimite: "Pro illimité", langue: "Langue", theme: "Thème", clair: "Clair", sombre: "Sombre", planActuel: "Plan actuel", upgrade: "Upgrade $9.99", lienAbo: "Lien d'abonnement", gerer: "Gérer mon abonnement LemonSqueezy →", support: "Support: support@detectai-labs.com", videoDesc: "Dépose ta vidéo ici (MP4, MOV, WebM)", imageDesc: "Dépose ton image ici (JPG, PNG, WebP)", docDesc: "Dépose ton document ici (PDF, DOCX, TXT)", classeurDesc: "Dépose ton classeur ici (XLSX, CSV)", bypassDesc: "Teste les techniques de contournement", drop: "Glisse-dépose ou clique pour parcourir", limite: "Limite gratuite atteinte", limiteDesc: "Tu as utilisé tes 3 analyses gratuites. Passe en Pro pour analyses illimitées.", debloquer: "Débloquer DetectAI Pro - $9.99", fileSelected: "Fichier sélectionné", noHistory: "Aucune analyse", deconnexion: "Déconnexion", bienvenue: "Bienvenue" },
+  en: { title: "DetectAI", sub: "World Version • Honest & Anonymous", detecteur: "Detector", historique: "History", parametres: "Settings", placeholder: "Paste your text here (min 50 chars)...", analyses: "free analyses left", sAbonner: "Subscribe - $9.99/month", annulable: "Cancelable • Payoneer", pro: "DetectAI Pro", mois: "Monthly • $9.99", analyser: "Analyze", caracteres: "characters", gratuitCount: "free", proIllimite: "Pro unlimited", langue: "Language", theme: "Theme", clair: "Light", sombre: "Dark", planActuel: "Current plan", upgrade: "Upgrade $9.99", lienAbo: "Subscription link", gerer: "Manage subscription →", support: "Support: support@detectai-labs.com", videoDesc: "Drop video here", imageDesc: "Drop image here", docDesc: "Drop document here", classeurDesc: "Drop workbook here", bypassDesc: "Test bypass", drop: "Drag & drop or click", limite: "Free limit reached", limiteDesc: "You used 3 free analyses.", debloquer: "Unlock Pro - $9.99", fileSelected: "File selected", noHistory: "No analysis", deconnexion: "Logout", bienvenue: "Welcome" },
+  es: { title: "DetectAI", sub: "Versión Mundial • Honesta y Anónima", detecteur: "Detector", historique: "Historial", parametres: "Ajustes", placeholder: "Pega tu texto aquí...", analyses: "análisis restantes", sAbonner: "Suscribirse - $9.99/mes", annulable: "Cancelable", pro: "DetectAI Pro", mois: "Mensual • $9.99", analyser: "Analizar", caracteres: "caracteres", gratuitCount: "gratis", proIllimite: "Pro ilimitado", langue: "Idioma", theme: "Tema", clair: "Claro", sombre: "Oscuro", planActuel: "Plan actual", upgrade: "Mejorar $9.99", lienAbo: "Enlace", gerer: "Gestionar →", support: "Soporte", videoDesc: "Suelta video aquí", imageDesc: "Suelta imagen aquí", docDesc: "Suelta documento aquí", classeurDesc: "Suelta libro aquí", bypassDesc: "Prueba evasión", drop: "Arrastra y suelta", limite: "Límite alcanzado", limiteDesc: "Usaste 3 análisis gratis.", debloquer: "Desbloquear Pro", fileSelected: "Archivo seleccionado", noHistory: "Sin análisis", deconnexion: "Cerrar sesión", bienvenue: "Bienvenido" },
+  ar: { title: "DetectAI", sub: "الإصدار العالمي • صادق ومجهول", detecteur: "الكاشف", historique: "السجل", parametres: "الإعدادات", placeholder: "الصق النص هنا...", analyses: "تحليلات متبقية", sAbonner: "اشترك - $9.99/شهر", annulable: "قابل للإلغاء", pro: "DetectAI Pro", mois: "شهري • $9.99", analyser: "حلل", caracteres: "حرف", gratuitCount: "مجاني", proIllimite: "Pro غير محدود", langue: "اللغة", theme: "المظهر", clair: "فاتح", sombre: "داكن", planActuel: "الخطة الحالية", upgrade: "ترقية $9.99", lienAbo: "رابط الاشتراك", gerer: "إدارة الاشتراك →", support: "الدعم", videoDesc: "أسقط الفيديو هنا", imageDesc: "أسقط الصورة هنا", docDesc: "أسقط المستند هنا", classeurDesc: "أسقط المصنف هنا", bypassDesc: "اختبر التجاوز", drop: "اسحب وأفلت", limite: "تم الوصول للحد", limiteDesc: "استخدمت 3 تحليلات مجانية.", debloquer: "فتح Pro", fileSelected: "تم اختيار الملف", noHistory: "لا يوجد تحليل", deconnexion: "تسجيل خروج", bienvenue: "مرحبا" }
 }
 
-const FREE_LIMIT = 3;
-const LEMON_CHECKOUT_URL = "https://detectai-labs.lemonsqueezy.com";
-const LEMON_JS_URL = "https://app.lemonsqueezy.com/js/lemon.js";
+export default function App() {
+  const [input, setInput] = useState('')
+  const [result, setResult] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState<TabType>('Texte')
+  const [activeSide, setActiveSide] = useState<SideType>('detecteur')
+  const [analysesCount, setAnalysesCount] = useState(0)
+  const [history, setHistory] = useState<any[]>([])
+  const [isPro, setIsPro] = useState(false)
+  const [showPaywall, setShowPaywall] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [lang, setLang] = useState<LangType>('fr')
+  const [theme, setTheme] = useState<'clair' | 'sombre'>('clair')
+  const [fileName, setFileName] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
+  const tr = T[lang]
+  const isDark = theme === 'sombre'
 
-export default function DetectAI() {
-  // --- States ---
-  const [activeSidebar, setActiveSidebar] = useState<SidebarType>('detecteur');
-  const [activeTab, setActiveTab] = useState<TabType>('texte');
-  const [inputText, setInputText] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analyses, setAnalyses] = useState<Analyse[]>([
-    {
-      id: '1',
-      type: 'texte',
-      content: 'L\'intelligence artificielle transforme notre quotidien de manière significative...',
-      result: 87,
-      date: 'Aujourd\'hui, 14:32',
-      isHuman: false
-    },
-    {
-      id: '2',
-      type: 'texte',
-      content: 'Je me souviens de cette soirée d\'été où nous étions tous réunis autour du feu...',
-      result: 12,
-      date: 'Hier, 09:15',
-      isHuman: true
+  // Auth check
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) { router.push('/auth'); return }
+      setUser(session.user)
+      // Charger profil
+      const { data: prof } = await supabase.from('profiles').select('*').eq('id', session.user.id).single()
+      if (prof) {
+        setProfile(prof)
+        setIsPro(prof.is_pro)
+        setAnalysesCount(prof.free_used)
+      }
+      // Charger historique
+      const { data: hist } = await supabase.from('analyses').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false }).limit(20)
+      if (hist) setHistory(hist)
     }
-  ]);
-  const [currentResult, setCurrentResult] = useState<Analyse | null>(null);
-  const [showPaywall, setShowPaywall] = useState(false);
-  const [isPro, setIsPro] = useState(false);
-  const [dragActive, setDragActive] = useState(false);
-  const [interactionTick, setInteractionTick] = useState(0);
-  const [upgradeStatus, setUpgradeStatus] = useState<string>('');
+    checkUser()
 
-  // Compteur local - en prod, brancher à Supabase / API
-  const freeUsed = analyses.length; // Simulé, en prod compter depuis backend
-  // Pour demo propre, on utilise local count distinct de l'historique seedé
-  const [freeCount, setFreeCount] = useState(0);
-  const remainingFree = Math.max(0, FREE_LIMIT - freeCount);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // --- LemonSqueezy Loader (lazy + safe for offline preview) ---
-  const loadLemonScript = useCallback(() => {
-    try {
-      if (typeof document === 'undefined') return;
-      if (document.querySelector(`script[src="${LEMON_JS_URL}"]`)) return;
-      const script = document.createElement('script');
-      script.src = LEMON_JS_URL;
-      script.defer = true;
-      script.async = true;
-      // Évite de polluer la console en offline - on gère l'erreur silencieusement
-      script.onerror = () => {
-        // Fallback silencieux, pas de console.error
-        console.info('Lemon.js offline - fallback vers lien direct');
-      };
-      document.body.appendChild(script);
-    } catch {}
-  }, []);
+    const { data: listener } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (!session) router.push('/auth')
+      else setUser(session.user)
+    })
+    return () => listener.subscription.unsubscribe()
+  }, [router])
 
   useEffect(() => {
-    // On ne charge Lemon que si online pour éviter les erreurs de validation offline
-    // Le script sera chargé au clic sur Upgrade de toute façon
-    if (typeof navigator !== 'undefined' && navigator.onLine) {
-      loadLemonScript();
-    }
+    const s = document.createElement('script')
+    s.src = 'https://app.lemonsqueezy.com/js/lemon.js'
+    s.defer = true
+    document.body.appendChild(s)
+  }, [])
 
-    // Écoute l'événement de succès de paiement LemonSqueezy
-    const handleLemonEvent = (e: any) => {
-      if (e.detail?.event === 'Checkout.Success') {
-        setIsPro(true);
-        setShowPaywall(false);
-        setUpgradeStatus('Paiement confirmé - Pro activé !');
-      }
-    };
-    window.addEventListener('LemonSqueezy:Checkout.Success', handleLemonEvent);
-    return () => window.removeEventListener('LemonSqueezy:Checkout.Success', handleLemonEvent);
-  }, [loadLemonScript]);
-
-  // --- Actions ---
   const handleUpgrade = () => {
-    // Feedback immédiat visible pour la validation + UX
-    setInteractionTick(t => t + 1);
-    setUpgradeStatus('Ouverture du paiement sécurisé...');
-    // Si déjà Pro, on affiche juste le statut
-    if (isPro) {
-      setUpgradeStatus('Vous êtes déjà en Pro ✓');
-      return;
-    }
-    // En mode gratuit, on montre d'abord la paywall avec bénéfices, puis checkout
-    // Pour le bouton sidebar "Passer Pro", on ouvre direct mais on garde un état visible
-    loadLemonScript();
-    // Ouvre le checkout LemonSqueezy
-    // Option 1: lien direct
-    // @ts-ignore - LemonSqueezy global
+    const email = user?.email || ''
+    window.open(CHECKOUT + encodeURIComponent(email), '_blank')
+  }
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0]
+    if (f) { setFileName(f.name); setInput(`Fichier: ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)`) }
+  }
+
+  const analyze = async () => {
+    if (activeTab === 'Texte' && !input.trim()) return
+    if (!isPro && analysesCount >= FREE_LIMIT) { setShowPaywall(true); return }
+    setLoading(true)
+    setResult(null)
     try {
-      if (window.LemonSqueezy && window.LemonSqueezy.Url) {
-        // @ts-ignore
-        window.LemonSqueezy.Url.Open(LEMON_CHECKOUT_URL);
-      } else {
-        window.open(LEMON_CHECKOUT_URL, '_blank', 'noopener');
-      }
-    } catch {
-      // Fallback iframe-safe: affiche le lien dans l'UI
-      setShowPaywall(true);
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/api/detect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+        body: JSON.stringify({ text: input, type: activeTab })
+      })
+      const data = await res.json()
+      if (res.status === 402) { setShowPaywall(true); return }
+      if (data.error) throw new Error(data.error)
+      setResult(data)
+      setAnalysesCount(c => isPro ? c : c + 1)
+      // Recharger historique
+      const { data: hist } = await supabase.from('analyses').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20)
+      if (hist) setHistory(hist)
+      const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+      if (prof) { setProfile(prof); setAnalysesCount(prof.free_used); setIsPro(prof.is_pro) }
+    } catch (e: any) {
+      alert('Erreur: ' + e.message)
     }
-    // Toujours montrer la paywall en fallback si popup bloquée
-    setTimeout(() => {
-      if (!isPro) setShowPaywall(true);
-    }, 400);
-  };
+    setLoading(false)
+  }
 
-  const handleAnalyse = async () => {
-    setInteractionTick(t => t + 1);
-    if (!inputText.trim() && activeTab === 'texte') return;
-    
-    // Vérifie le quota gratuit
-    if (!isPro && freeCount >= FREE_LIMIT) {
-      setShowPaywall(true);
-      setUpgradeStatus('Limite gratuite atteinte - Passez Pro pour continuer');
-      return;
-    }
+  const handleLogout = async () => { await supabase.auth.signOut(); router.push('/auth') }
 
-    setIsAnalyzing(true);
-    setCurrentResult(null);
-
-    // Simulation API - Remplacer par ton vrai endpoint /api/detect
-    await new Promise(r => setTimeout(r, 1600));
-
-    const isLikelyHuman = inputText.length < 80 || /je me souviens|haha|ptdr|bah|en vrai/i.test(inputText);
-    const score = isLikelyHuman 
-      ? Math.floor(Math.random() * 25) + 5 
-      : Math.floor(Math.random() * 35) + 60;
-
-    const newAnalyse: Analyse = {
-      id: Date.now().toString(),
-      type: activeTab,
-      content: activeTab === 'texte' ? inputText.slice(0, 120) + (inputText.length > 120 ? '...' : '') : `Fichier ${activeTab} analysé`,
-      result: score,
-      date: 'À l\'instant',
-      isHuman: score < 50
-    };
-
-    setCurrentResult(newAnalyse);
-    setAnalyses(prev => [newAnalyse, ...prev].slice(0, 50));
-    
-    if (!isPro) setFreeCount(c => c + 1);
-    setIsAnalyzing(false);
-  };
-
-  const tabs = [
-    { id: 'texte' as TabType, label: 'Texte', icon: FileText },
-    { id: 'video' as TabType, label: 'Vidéo', icon: Video },
-    { id: 'image' as TabType, label: 'Image', icon: ImageIcon },
-    { id: 'document' as TabType, label: 'Document', icon: FileCheck },
-    { id: 'classeur' as TabType, label: 'Classeur', icon: FolderOpen },
-    { id: 'anti-bypass' as TabType, label: 'Anti-Bypass', icon: ShieldCheck },
-  ];
+  if (!user) return <div className="min-h-screen flex items-center justify-center">Chargement...</div>
 
   return (
-    <div data-tick={interactionTick} className="min-h-screen bg-[#f5f7fb] text-[#0f172a] font-[Inter,system-ui,sans-serif] antialiased selection:bg-[#1e293b]/10 overflow-x-hidden">
-      {/* Font */}
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');`}</style>
+    <div className={`min-h-screen flex flex-col lg:flex-row ${isDark? 'bg-[#0f172a] text-white' : 'bg-[#f8fafc] text-[#0f172a]'}`}>
+      <header className={`lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'}`}>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xl">{mobileOpen? '✕' : '☰'}</button>
+          <div className="flex items-center gap-2 ml-1"><div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold">D</div><span className="font-bold">DETECTAI</span></div>
+        </div>
+        <div className="text-xs font-bold bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full">{analysesCount}/{FREE_LIMIT}</div>
+      </header>
 
-      <div className="flex min-h-screen">
-        {/* SIDEBAR - Blanche */}
-        <aside className="w-[260px] shrink-0 bg-white border-r border-[#e8ecf2] hidden md:flex flex-col sticky top-0 h-screen overflow-hidden">
-          {/* Logo */}
-          <div className="px-7 pt-8 pb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-[10px] bg-[#1e293b] flex items-center justify-center text-white">
-                <Sparkles className="w-[18px] h-[18px]" />
-              </div>
-              <div>
-                <h1 className="text-[17px] font-bold tracking-tight leading-none">DetectAI</h1>
-                <p className="text-[11px] text-[#94a3b8] font-medium mt-[3px] tracking-wide uppercase">Détecteur IA</p>
-              </div>
-            </div>
-          </div>
+      {mobileOpen && <div className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-20" onClick={() => setMobileOpen(false)} />}
 
-          {/* Nav */}
-          <nav className="px-3 mt-2 space-y-1">
-            {[
-              { id: 'detecteur' as SidebarType, label: 'Détecteur', icon: Search, active: true },
-              { id: 'historique' as SidebarType, label: 'Historique', icon: History },
-              { id: 'parametres' as SidebarType, label: 'Paramètres', icon: Settings },
-            ].map(item => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActiveSidebar(item.id);
-                  setInteractionTick(t => t + 1);
-                  // Force un feedback visible même si déjà actif
-                  if (item.id === 'detecteur') setCurrentResult(null);
-                }}
-                className={`w-full flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-[14px] font-medium transition-all
-                  ${activeSidebar === item.id 
-                    ? 'bg-[#f1f5f9] text-[#0f172a]' 
-                    : 'text-[#64748b] hover:bg-[#f8fafc] hover:text-[#334155]'}`}
-              >
-                <item.icon className="w-[18px] h-[18px]" />
-                {item.label}
-                {activeSidebar === item.id && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#1e293b] opacity-60" />}
-              </button>
-            ))}
+      <aside className={`${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e8ecf0]'} border-r flex flex-col lg:w-64 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 fixed inset-y-0 left-0 w-[80%] max-w-[300px] z-30 h-[100dvh] transition-transform duration-300 ${mobileOpen? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <div className="p-5 flex flex-col h-full">
+          <div className="hidden lg:flex items-center gap-2 mb-2"><div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold">D</div><span className="font-bold">DETECTAI</span><span className="text-[10px] bg-slate-900 text-white px-2 py-0.5 rounded-full font-bold">PRO</span></div>
+          <p className="hidden lg:block text-[11px] text-slate-400 mb-6 truncate">{tr.bienvenue} {user.email}</p>
+          <div className="lg:hidden flex justify-between items-center mb-6"><span className="font-bold">Menu</span><button onClick={() => setMobileOpen(false)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">✕</button></div>
+          <nav className="space-y-2">
+            <button onClick={() => { setActiveSide('detecteur'); setMobileOpen(false) }} className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium ${activeSide==='detecteur'? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}>◉ {tr.detecteur}</button>
+            <button onClick={() => { setActiveSide('historique'); setMobileOpen(false) }} className={`w-full text-left px-4 py-2.5 rounded-xl text-sm flex justify-between ${activeSide==='historique'? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}><span>🕒 {tr.historique}</span><span className="text-xs bg-slate-100 px-2 py-0.5 rounded-full">{history.length}</span></button>
+            <button onClick={() => { setActiveSide('parametres'); setMobileOpen(false) }} className={`w-full text-left px-4 py-2.5 rounded-xl text-sm ${activeSide==='parametres'? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}>⚙️ {tr.parametres}</button>
           </nav>
+          <div className="mt-auto space-y-3">
+            {!isPro ? (
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-100 border border-amber-200 rounded-2xl p-4">
+                <p className="text-sm font-bold flex items-center gap-2">{tr.pro} <span className="bg-amber-200 text-[11px] px-2 py-0.5 rounded-full">6000 F</span></p>
+                <p className="text-xs text-slate-600 mt-1">{tr.mois}<br/>{FREE_LIMIT - analysesCount > 0? `${FREE_LIMIT - analysesCount} ${tr.analyses}` : tr.limite}</p>
+                <button onClick={handleUpgrade} className="mt-3 w-full bg-slate-900 text-white py-2.5 rounded-xl text-sm font-bold">{tr.sAbonner}</button>
+              </div>
+            ) : <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-center"><p className="text-sm font-bold text-green-700">✓ Pro Activé - Illimité</p></div>}
+            <button onClick={handleLogout} className="w-full text-xs text-slate-400 underline text-center">{tr.deconnexion}</button>
+          </div>
+        </div>
+      </aside>
 
-          {/* Quota Card */}
-          <div className="mt-auto p-4">
-            <div className="rounded-[14px] border border-[#e8ecf2] bg-[#fbfcfe] p-4">
-              {!isPro ? (
-                <>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[12px] font-semibold text-[#334155] tracking-wide">Plan gratuit</span>
-                    <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#475569]">{remainingFree}/{FREE_LIMIT}</span>
+      <main className="flex-1 min-w-0">
+        <div className="max-w-4xl mx-auto p-4 lg:p-8">
+          {activeSide === 'detecteur' && (
+            <>
+              <div className="hidden lg:block"><h1 className="text-3xl font-bold">{tr.title}</h1><p className="text-slate-500 mt-1 text-sm">{tr.sub}</p></div>
+              <div className="flex gap-2 mt-4 lg:mt-6 overflow-x-auto pb-2">
+                {(['Texte','Vidéo','Image','Document','Classeur','Anti-Bypass'] as TabType[]).map(tab => (
+                  <button key={tab} onClick={() => { setActiveTab(tab); setResult(null); setFileName('') }} className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium ${activeTab===tab? 'bg-slate-900 text-white' : 'bg-white border text-slate-600'}`}>{tab}</button>
+                ))}
+              </div>
+              <div className={`mt-4 rounded-2xl border shadow-sm p-4 ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'}`}>
+                {activeTab === 'Texte' ? (
+                  <>
+                    <textarea value={input} onChange={e=>setInput(e.target.value)} placeholder={tr.placeholder} className={`w-full h-48 lg:h-56 resize-none outline-none text-[15px] ${isDark? 'bg-[#1e293b] text-white' : 'bg-white text-slate-700'}`} />
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-3 mt-4 pt-4 border-t border-slate-100">
+                      <span className="text-xs text-slate-400">{input.length} {tr.caracteres} • {isPro? tr.proIllimite : `${analysesCount}/${FREE_LIMIT} ${tr.gratuitCount}`}</span>
+                      <button onClick={analyze} disabled={loading} className="w-full sm:w-auto bg-slate-900 text-white px-8 py-3 rounded-xl font-bold disabled:opacity-50">{loading? 'Analyse...' : 'Analyser →'}</button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="py-10 text-center">
+                    <div onClick={() => fileRef.current?.click()} className="cursor-pointer">
+                      <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">📁</div>
+                      <p className="font-medium">{activeTab === 'Vidéo'? tr.videoDesc : activeTab === 'Image'? tr.imageDesc : activeTab === 'Document'? tr.docDesc : activeTab === 'Classeur'? tr.classeurDesc : tr.bypassDesc}</p>
+                      <p className="text-sm text-slate-500 mt-1">{tr.drop}</p>
+                      {fileName && <p className="text-xs mt-3 bg-slate-100 inline-block px-3 py-1 rounded-full">✓ {tr.fileSelected}: {fileName}</p>}
+                      <div className="mt-4 flex flex-col items-center gap-3">
+                        <button className="bg-slate-900 text-white px-5 py-2 rounded-xl text-sm font-bold">Parcourir</button>
+                        {fileName && <button onClick={analyze} disabled={loading} className="bg-green-600 text-white px-8 py-2.5 rounded-xl text-sm font-bold">{loading? 'Analyse...' : `Analyser ${activeTab} →`}</button>}
+                      </div>
+                    </div>
+                    <input ref={fileRef} type="file" className="hidden" onChange={(e)=>{ const f=e.target.files?.[0]; if(f){ setFileName(f.name); setInput(`Fichier: ${f.name}`) } }} />
                   </div>
-                  <div className="h-1.5 w-full bg-[#e8ecf2] rounded-full overflow-hidden mb-3">
-                    <div className="h-full bg-[#1e293b] transition-all" style={{ width: `${(freeCount / FREE_LIMIT) * 100}%` }} />
+                )}
+              </div>
+
+              {result && (
+                <div className={`mt-6 rounded-2xl border p-6 ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'}`}>
+                  <div className="flex items-center gap-4">
+                    <div className={`w-16 h-16 rounded-2xl ${result.color} text-white flex items-center justify-center text-xl font-bold`}>{result.score}%</div>
+                    <div><p className="font-bold">Niveau: {result.level}</p><p className="text-sm text-slate-500">Probabilité IA • {activeTab} • Confiance {result.details?.confidence}</p></div>
                   </div>
-                  <p className="text-[12px] leading-[1.5] text-[#64748b] mb-3">
-                    {remainingFree > 0 ? `Il vous reste ${remainingFree} analyse${remainingFree > 1 ? 's' : ''} gratuite${remainingFree > 1 ? 's' : ''}.` : 'Limite atteinte.'}
-                  </p>
-                  <button
-                    onClick={handleUpgrade}
-                    className="w-full h-[36px] rounded-[10px] bg-[#1e293b] text-white text-[13px] font-semibold flex items-center justify-center gap-1.5 hover:bg-[#0f172a] transition-colors"
-                  >
-                    <Crown className="w-4 h-4" />
-                    Passer Pro
-                  </button>
-                  {upgradeStatus && (
-                    <p className="text-[11px] text-[#1e293b] font-medium mt-2.5 bg-white border border-[#e2e8f0] rounded-[8px] px-2.5 py-1.5 text-center leading-tight">
-                      {upgradeStatus}
-                    </p>
-                  )}
-                </>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#1e293b] flex items-center justify-center">
-                    <Crown className="w-4 h-4 text-white" />
+                  <div className="mt-5 grid grid-cols-3 gap-3 text-xs">
+                    <div className="bg-slate-50 p-3 rounded-xl"><p className="text-slate-400">Perplexité</p><p className="font-bold mt-1">{result.details?.perplexity}</p></div>
+                    <div className="bg-slate-50 p-3 rounded-xl"><p className="text-slate-400">Burstiness</p><p className="font-bold mt-1">{result.details?.burstiness}</p></div>
+                    <div className="bg-slate-50 p-3 rounded-xl"><p className="text-slate-400">Confiance</p><p className="font-bold mt-1">{result.details?.confidence}</p></div>
                   </div>
-                  <div>
-                    <p className="text-[13px] font-semibold">Plan Pro actif</p>
-                    <p className="text-[11px] text-[#64748b]">Analyses illimitées</p>
+                  <div className="mt-5">
+                    <p className="text-sm font-semibold mb-2">Pourquoi {result.score > 50 ? 'probablement IA' : 'probablement humain'} ?</p>
+                    <ul className="text-sm text-slate-600 space-y-1">
+                      {result.details?.reasons?.map((r:string,i:number)=><li key={i} className="flex gap-2"><span>•</span><span>{r}</span></li>)}
+                    </ul>
+                    {result.details?.iaPhrasesDetected?.length > 0 && (
+                      <div className="mt-3 text-xs bg-red-50 border border-red-100 p-3 rounded-xl">
+                        <p className="font-bold text-red-700">Phrases typiques IA détectées:</p>
+                        <p className="mt-1 text-red-600">"{result.details.iaPhrasesDetected.join('", "')}"</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
+            </>
+          )}
+
+          {activeSide === 'historique' && (
+            <div className={`rounded-2xl border ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white'}`}>
+              <div className="p-6 border-b flex justify-between"><h2 className="font-bold text-lg">{tr.historique}</h2><span className="text-xs bg-slate-100 px-2 py-1 rounded-full">{history.length} analyses</span></div>
+              {history.length===0 ? <div className="p-8 text-center text-sm text-slate-500">{tr.noHistory}</div> : <div className="divide-y">{history.map((h:any)=><div key={h.id} className="p-4 flex justify-between items-center"><div><p className="text-sm font-medium truncate max-w-[250px]">{h.content_preview}</p><p className="text-[11px] text-slate-400">{h.type} • {new Date(h.created_at).toLocaleDateString()}</p></div><span className={`text-xs font-bold px-2.5 py-1 rounded-full ${h.score>70? 'bg-red-100 text-red-700' : h.score>40? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>{h.score}% {h.level}</span></div>)}</div>}
             </div>
-            <p className="text-[11px] text-[#94a3b8] mt-3 px-1 text-center">© 2025 DetectAI Labs</p>
-          </div>
-        </aside>
+          )}
 
-        {/* MAIN */}
-        <main className="flex-1 min-w-0 overflow-x-hidden">
-          {/* Topbar Mobile */}
-          <div className="md:hidden flex items-center justify-between px-5 py-4 bg-white border-b border-[#e8ecf2] sticky top-0 z-10">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-[9px] bg-[#1e293b] flex items-center justify-center text-white">
-                <Sparkles className="w-4 h-4" />
+          {activeSide === 'parametres' && (
+            <div className="max-w-[640px] space-y-4">
+              <div className={`rounded-2xl border p-6 md:p-8 ${isDark? 'bg-[#1e293b] border-[#334155]' : 'bg-white'}`}>
+                <h2 className="text-xl font-bold mb-2">{tr.parametres}</h2>
+                <p className="text-xs text-slate-400 mb-6">{tr.bienvenue} {user.email} • {isPro? 'Pro' : `Gratuit ${analysesCount}/${FREE_LIMIT}`}</p>
+                <div className="pb-6 border-b mb-6 flex justify-between items-center"><div><p className="font-semibold text-sm">{tr.planActuel}</p><p className="text-xs text-slate-500">{isPro? 'Pro illimité - $9.99/mois' : `Gratuit ${analysesCount}/${FREE_LIMIT}`}</p></div><button onClick={handleUpgrade} className="h-10 px-5 rounded-xl bg-slate-900 text-white text-sm font-bold">{isPro? 'Gérer' : tr.upgrade}</button></div>
+                <div className="pb-6 border-b mb-6"><p className="font-semibold text-sm mb-3">🌐 {tr.langue}</p><div className="grid grid-cols-2 gap-3"><button onClick={() => setLang('fr')} className={`h-[64px] rounded-xl border-2 ${lang==='fr'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🇫🇷 Français</button><button onClick={() => setLang('en')} className={`h-[64px] rounded-xl border-2 ${lang==='en'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🇺🇸 English</button><button onClick={() => setLang('es')} className={`h-[64px] rounded-xl border-2 ${lang==='es'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🇪🇸 Español</button><button onClick={() => setLang('ar')} className={`h-[64px] rounded-xl border-2 ${lang==='ar'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🇸🇦 العربية</button></div></div>
+                <div className="pb-6 border-b mb-6"><p className="font-semibold text-sm mb-3">🎨 {tr.theme}</p><div className="grid grid-cols-2 gap-3"><button onClick={() => setTheme('clair')} className={`h-[64px] rounded-xl border-2 ${theme==='clair'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>☀️ {tr.clair}</button><button onClick={() => setTheme('sombre')} className={`h-[64px] rounded-xl border-2 ${theme==='sombre'? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}`}>🌙 {tr.sombre}</button></div></div>
+                <div><p className="font-semibold text-sm mb-2">{tr.lienAbo}</p><p className="text-[11px] font-mono break-all bg-slate-50 p-3 rounded-xl border">{CHECKOUT}{user.email}</p><a href={CHECKOUT + encodeURIComponent(user.email)} target="_blank" className="inline-flex mt-3 text-xs underline">{tr.gerer}</a><p className="text-[11px] text-slate-400 mt-4">{tr.support} • Payoneer: Djemnaba Djigo • 6000F</p></div>
               </div>
-              <span className="font-bold">DetectAI</span>
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-100 border border-amber-200 rounded-2xl p-5"><p className="font-bold flex items-center gap-2">{tr.pro} <span className="bg-slate-900 text-white text-[11px] px-2 py-0.5 rounded-full">6000 F</span></p><p className="text-xs mt-1 text-slate-600">{tr.mois} • Annulable • Payoneer</p><button onClick={handleUpgrade} className="mt-3 w-full h-11 rounded-xl bg-slate-900 text-white font-bold text-sm">S'abonner - $9.99/mois</button></div>
+              <button onClick={handleLogout} className="w-full text-sm text-slate-400 underline">{tr.deconnexion}</button>
             </div>
-            {!isPro && (
-              <button onClick={() => { setInteractionTick(t=>t+1); handleUpgrade(); }} className="text-[12px] font-semibold px-3 py-1.5 rounded-full bg-[#1e293b] text-white flex items-center gap-1">
-                <Crown className="w-3.5 h-3.5" /> Pro
-              </button>
-            )}
-          </div>
+          )}
+        </div>
+      </main>
 
-          {/* Content Wrapper */}
-          <div className="max-w-[980px] mx-auto px-5 md:px-10 py-6 md:py-10 w-full box-border">
-            
-            {/* Header */}
-            <div className="mb-7">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-[28px] md:text-[32px] font-bold tracking-[-0.02em] leading-[1.1]">Détecteur de contenu IA</h2>
-                  <p className="text-[14px] text-[#64748b] mt-2 leading-[1.5] max-w-[560px]">
-                    Analysez instantanément si un texte, une image ou une vidéo a été généré par une IA. Précision supérieure à 98%.
-                  </p>
-                  {upgradeStatus && (
-                    <div className="mt-3 inline-flex items-center gap-2 text-[12px] font-medium px-3 py-1.5 rounded-full bg-[#1e293b] text-white">
-                      <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                      {upgradeStatus}
-                    </div>
-                  )}
-                </div>
-                <div className="hidden md:flex items-center gap-2 text-[12px] font-medium text-[#475569] bg-white border border-[#e8ecf2] px-3 py-1.5 rounded-full">
-                  <div className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse" />
-                  Système opérationnel
-                </div>
-              </div>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex items-center gap-1.5 p-1 rounded-[14px] bg-white border border-[#e8ecf2] w-full md:w-fit overflow-x-auto max-w-full scrollbar-none mb-6 box-border">
-              {tabs.map(t => (
-                <button
-                  key={t.id}
-                  onClick={() => {
-                    setActiveTab(t.id);
-                    setInteractionTick(tk => tk + 1);
-                    setCurrentResult(null);
-                  }}
-                  className={`shrink-0 flex items-center gap-1.5 px-3.5 py-[8px] rounded-[10px] text-[13px] font-medium transition-all
-                    ${activeTab === t.id 
-                      ? 'bg-[#1e293b] text-white shadow-sm' 
-                      : 'text-[#64748b] hover:text-[#0f172a] hover:bg-[#f8fafc]'}`}
-                >
-                  <t.icon className="w-4 h-4" />
-                  {t.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Main Card */}
-            {activeSidebar === 'detecteur' && (
-              <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-5 w-full max-w-full">
-                {/* Input Card */}
-                <div className="bg-white rounded-[18px] border border-[#e8ecf2] shadow-[0_1px_2px_rgba(16,24,40,0.04)] overflow-hidden min-w-0">
-                  {/* Tab specific content */}
-                  {activeTab === 'texte' ? (
-                    <div className="p-1">
-                      <div className="relative">
-                        <textarea
-                          value={inputText}
-                          onChange={e => setInputText(e.target.value)}
-                          placeholder="Collez votre texte ici (minimum 50 caractères pour une analyse fiable)..."
-                          className="w-full min-h-[300px] md:min-h-[360px] resize-none bg-[#fbfcfe] rounded-[12px] border border-[#eef2f7] p-5 text-[14.5px] leading-[1.65] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#1e293b]/10 focus:border-[#1e293b]/20 transition-all box-border"
-                        />
-                        <div className="absolute bottom-3 right-3 flex items-center gap-2">
-                          <span className="text-[11px] font-mono text-[#94a3b8] bg-white border border-[#e2e8f0] px-2 py-1 rounded-full">
-                            {inputText.length} car.
-                          </span>
-                          {inputText && (
-                            <button onClick={() => setInputText('')} className="w-7 h-7 rounded-full bg-white border border-[#e2e8f0] flex items-center justify-center hover:bg-[#f8fafc]">
-                              <X className="w-3.5 h-3.5 text-[#64748b]" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap items-center justify-between gap-3 p-4 pt-3">
-                        <div className="flex items-center gap-2 text-[12px] text-[#64748b]">
-                          <ShieldCheck className="w-4 h-4 text-[#94a3b8]" />
-                          <span>Chiffrement bout-à-bout • Non stocké</span>
-                        </div>
-                        <button
-                          onClick={handleAnalyse}
-                          disabled={isAnalyzing || inputText.trim().length < 10}
-                          className="h-[42px] px-[22px] rounded-[12px] bg-[#1e293b] text-white text-[14px] font-semibold flex items-center gap-2 hover:bg-[#0f172a] disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
-                        >
-                          {isAnalyzing ? (
-                            <>
-                              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                              Analyse en cours...
-                            </>
-                          ) : (
-                            <>
-                              <Zap className="w-4 h-4" />
-                              Analyser
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    // Upload placeholder pour les autres tabs
-                    <div className="p-6">
-                      <div
-                        onDragOver={e => { e.preventDefault(); setDragActive(true); }}
-                        onDragLeave={() => setDragActive(false)}
-                        onDrop={e => { e.preventDefault(); setDragActive(false); }}
-                        className={`rounded-[14px] border-2 border-dashed transition-all min-h-[320px] flex flex-col items-center justify-center p-8 text-center
-                          ${dragActive ? 'border-[#1e293b] bg-[#f8fafc]' : 'border-[#e2e8f0] bg-[#fbfcfe] hover:border-[#cbd5e1] hover:bg-[#f8fafc]'}`}
-                      >
-                        <div className="w-12 h-12 rounded-[12px] bg-white border border-[#e8ecf2] flex items-center justify-center mb-4 shadow-sm">
-                          <Upload className="w-5 h-5 text-[#475569]" />
-                        </div>
-                        <h3 className="text-[15px] font-semibold">Déposez votre {activeTab} ici</h3>
-                        <p className="text-[13px] text-[#64748b] mt-1 max-w-[320px] leading-[1.5]">
-                          {activeTab === 'video' && 'MP4, MOV, WebM jusqu\'à 500Mo. Analyse des frames et métadonnées.'}
-                          {activeTab === 'image' && 'JPG, PNG, WebP. Détection des artefacts de génération.'}
-                          {activeTab === 'document' && 'PDF, DOCX, TXT. Extraction et analyse sémantique.'}
-                          {activeTab === 'classeur' && 'Importez un dossier complet. Analyse en lot disponible en Pro.'}
-                          {activeTab === 'anti-bypass' && 'Testez la résistance aux techniques de contournement et paraphrase.'}
-                        </p>
-                        <div className="flex items-center gap-2 mt-5">
-                          <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="h-9 px-4 rounded-[10px] bg-[#1e293b] text-white text-[13px] font-semibold"
-                          >
-                            Parcourir
-                          </button>
-                          <span className="text-[12px] text-[#94a3b8]">ou glissez-déposez</span>
-                        </div>
-                        <input ref={fileInputRef} type="file" className="hidden" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Result Card */}
-                <div className="bg-white rounded-[18px] border border-[#e8ecf2] shadow-[0_1px_2px_rgba(16,24,40,0.04)] p-5 md:p-6 min-w-0">
-                  <div className="flex items-center justify-between mb-5">
-                    <h3 className="text-[14px] font-semibold tracking-tight">Résultat</h3>
-                    <div className="flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[#475569] border border-[#e2e8f0]">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#22c55e]" />
-                      Modèle DetectAI • Précis
-                    </div>
-                  </div>
-
-                  {!currentResult && !isAnalyzing ? (
-                    <div className="py-16 flex flex-col items-center text-center">
-                      <div className="w-14 h-14 rounded-[14px] bg-[#f8fafc] border border-[#eef2f7] flex items-center justify-center mb-4">
-                        <Search className="w-6 h-6 text-[#94a3b8]" />
-                      </div>
-                      <p className="text-[13px] font-medium text-[#334155]">En attente d'analyse</p>
-                      <p className="text-[12px] text-[#94a3b8] mt-1 max-w-[200px] leading-[1.5]">Votre résultat apparaîtra ici avec le score de confiance et les indices.</p>
-                    </div>
-                  ) : isAnalyzing ? (
-                    <div className="space-y-4 animate-pulse">
-                      <div className="h-24 rounded-[12px] bg-[#f1f5f9]" />
-                      <div className="h-4 rounded bg-[#f1f5f9] w-3/4" />
-                      <div className="h-4 rounded bg-[#f1f5f9] w-1/2" />
-                      <div className="space-y-2 pt-2">
-                        <div className="h-3 rounded bg-[#f1f5f9]" />
-                        <div className="h-3 rounded bg-[#f1f5f9]" />
-                        <div className="h-3 rounded bg-[#f1f5f9] w-5/6" />
-                      </div>
-                    </div>
-                  ) : currentResult && (
-                    <div className="space-y-5">
-                      {/* Score Circle */}
-                      <div className="flex items-center gap-5">
-                        <div className="relative w-[92px] h-[92px] shrink-0">
-                          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="42" fill="none" stroke="#f1f5f9" strokeWidth="8" />
-                            <circle
-                              cx="50" cy="50" r="42" fill="none"
-                              stroke={currentResult.isHuman ? '#22c55e' : '#ef4444'}
-                              strokeWidth="8"
-                              strokeLinecap="round"
-                              strokeDasharray={`${(currentResult.isHuman ? 100 - currentResult.result : currentResult.result) * 2.64} 264`}
-                              className="transition-all duration-1000"
-                            />
-                          </svg>
-                          <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-[22px] font-bold tracking-tight leading-none">
-                              {currentResult.isHuman ? 100 - currentResult.result : currentResult.result}%
-                            </span>
-                            <span className="text-[10px] font-semibold tracking-widest uppercase mt-0.5 text-[#64748b]">
-                              {currentResult.isHuman ? 'Humain' : 'IA'}
-                            </span>
-                          </div>
-                        </div>
-                        <div>
-                          <p className={`text-[15px] font-semibold leading-tight ${currentResult.isHuman ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>
-                            {currentResult.isHuman ? 'Très probablement humain' : 'Très probablement généré par IA'}
-                          </p>
-                          <p className="text-[12px] text-[#64748b] mt-1.5 leading-[1.5]">
-                            {currentResult.isHuman
-                              ? 'Style naturel, variations et imperfections cohérentes avec une écriture humaine.'
-                              : 'Perplexité faible, burstiness uniforme et patterns caractéristiques des LLM.'}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Details */}
-                      <div className="rounded-[12px] bg-[#fbfcfe] border border-[#eef2f7] divide-y divide-[#eef2f7]">
-                        {[
-                          { k: 'Perplexité', v: currentResult.isHuman ? 'Élevée' : 'Basse', s: currentResult.isHuman ? 'Humain' : 'IA' },
-                          { k: 'Burstiness', v: currentResult.isHuman ? 'Variable' : 'Uniforme', s: currentResult.isHuman ? 'Humain' : 'IA' },
-                          { k: 'Confiance', v: `${Math.max(currentResult.result, 100 - currentResult.result)}%`, s: 'Élevée' },
-                        ].map(row => (
-                          <div key={row.k} className="flex items-center justify-between px-4 py-3 text-[12.5px]">
-                            <span className="text-[#64748b] font-medium">{row.k}</span>
-                            <span className="flex items-center gap-2 font-medium">
-                              {row.v}
-                              <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold tracking-wide
-                                ${row.s === 'Humain' ? 'bg-[#dcfce7] text-[#15803d]' : row.s === 'IA' ? 'bg-[#fee2e2] text-[#b91c1c]' : 'bg-[#f1f5f9] text-[#475569]'}`}>
-                                {row.s}
-                              </span>
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <button className="w-full h-10 rounded-[10px] border border-[#e2e8f0] bg-white text-[13px] font-medium flex items-center justify-center gap-1.5 hover:bg-[#f8fafc]">
-                        Voir le rapport détaillé <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Historique */}
-            {activeSidebar === 'historique' && (
-              <div className="bg-white rounded-[18px] border border-[#e8ecf2] overflow-hidden w-full max-w-full">
-                <div className="p-6 border-b border-[#eef2f7] flex items-center justify-between">
-                  <h3 className="text-[15px] font-semibold">Historique d'analyses</h3>
-                  <span className="text-[12px] text-[#94a3b8] font-mono">{analyses.length} analyses</span>
-                </div>
-                <div className="divide-y divide-[#f1f5f9]">
-                  {analyses.map(a => (
-                    <div key={a.id} className="p-5 flex items-center justify-between gap-4 hover:bg-[#fbfcfe] transition-colors min-w-0">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 ${a.isHuman ? 'bg-[#dcfce7] text-[#15803d]' : 'bg-[#fee2e2] text-[#b91c1c]'}`}>
-                          {a.isHuman ? <Check className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[13.5px] font-medium truncate max-w-[200px] md:max-w-[420px]">{a.content}</p>
-                          <p className="text-[11px] text-[#94a3b8] mt-0.5">{a.date} • {a.type} • {a.result}% {a.isHuman ? 'Humain' : 'IA'}</p>
-                        </div>
-                      </div>
-                      <div className={`shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-full ${a.isHuman ? 'bg-[#f0fdf4] text-[#15803d] border border-[#bbf7d0]' : 'bg-[#fef2f2] text-[#b91c1c] border border-[#fecaca]'}`}>
-                        {a.isHuman ? 'HUMAIN' : 'IA'}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Paramètres */}
-            {activeSidebar === 'parametres' && (
-              <div className="bg-white rounded-[18px] border border-[#e8ecf2] p-8 max-w-[640px] w-full box-border">
-                <h3 className="text-[16px] font-semibold mb-6">Paramètres</h3>
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between py-3 border-b border-[#f1f5f9]">
-                    <div>
-                      <p className="text-[13px] font-medium">Mode strict</p>
-                      <p className="text-[12px] text-[#64748b]">Détection plus agressive, plus de faux positifs</p>
-                    </div>
-                    <div className="w-10 h-6 rounded-full bg-[#e2e8f0] p-1">
-                      <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between py-3 border-b border-[#f1f5f9]">
-                    <div>
-                      <p className="text-[13px] font-medium">Sauvegarde de l'historique</p>
-                      <p className="text-[12px] text-[#64748b]">Stockage local uniquement</p>
-                    </div>
-                    <div className="w-10 h-6 rounded-full bg-[#1e293b] p-1 flex justify-end">
-                      <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
-                    </div>
-                  </div>
-                  <div className="pt-2">
-                    <p className="text-[12px] font-mono text-[#94a3b8]">DetectAI • Build stable • LemonSqueezy intégré</p>
-                    <p className="text-[12px] text-[#64748b] mt-1">Support: support@detectai-labs.com</p>
-                    <a href={LEMON_CHECKOUT_URL} target="_blank" rel="noopener" className="inline-flex mt-3 text-[12px] font-medium text-[#1e293b] underline underline-offset-4">Gérer mon abonnement LemonSqueezy →</a>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Info footer */}
-            <div className="mt-10 flex items-center gap-2 text-[11px] text-[#94a3b8] justify-center md:justify-start">
-              <AlertCircle className="w-3.5 h-3.5" />
-              DetectAI ne stocke jamais vos contenus. Analyses conformes RGPD.
-            </div>
-          </div>
-        </main>
-      </div>
-
-      {/* PAYWALL MODAL */}
       {showPaywall && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#0f172a]/60 backdrop-blur-[6px]" onClick={() => setShowPaywall(false)} />
-          <div className="relative w-full max-w-[440px] bg-white rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.2)] border border-white/20 overflow-hidden animate-[in_0.25s_ease] box-border">
-            <div className="p-7">
-              <div className="flex items-start justify-between mb-6">
-                <div className="w-11 h-11 rounded-[12px] bg-[#1e293b] flex items-center justify-center text-white">
-                  <Lock className="w-5 h-5" />
-                </div>
-                <button onClick={() => setShowPaywall(false)} className="w-8 h-8 rounded-full bg-[#f1f5f9] flex items-center justify-center hover:bg-[#e2e8f0]">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <h3 className="text-[22px] font-bold tracking-[-0.02em] leading-[1.15]">
-                Vous avez atteint la limite gratuite
-              </h3>
-              <p className="text-[14px] text-[#64748b] leading-[1.55] mt-3">
-                Vous avez utilisé vos <span className="font-semibold text-[#0f172a]">{FREE_LIMIT} analyses gratuites</span>. Passez Pro pour des analyses illimitées, rapports PDF et API.
-              </p>
-
-              <div className="mt-6 rounded-[14px] bg-[#f8fafc] border border-[#eef2f7] p-4 space-y-3">
-                {[
-                  'Analyses illimitées Texte, Image, Vidéo, Document',
-                  'Rapports détaillés exportables en PDF',
-                  'Mode Anti-Bypass & détection paraphrase',
-                  'API + Classeur lot (100 fichiers)',
-                  'Support prioritaire'
-                ].map(f => (
-                  <div key={f} className="flex items-center gap-2.5 text-[13px]">
-                    <div className="w-5 h-5 rounded-full bg-[#1e293b] flex items-center justify-center shrink-0">
-                      <Check className="w-3 h-3 text-white" />
-                    </div>
-                    <span className="text-[#334155] font-medium">{f}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                <div className="rounded-[12px] border border-[#e2e8f0] p-3.5">
-                  <p className="text-[11px] font-semibold tracking-widest uppercase text-[#94a3b8]">Mensuel</p>
-                  <p className="text-[20px] font-bold mt-1 leading-none">19€<span className="text-[12px] font-medium text-[#64748b]">/mois</span></p>
-                </div>
-                <div className="rounded-[12px] border-2 border-[#1e293b] p-3.5 bg-[#fbfcfe] relative">
-                  <span className="absolute -top-2.5 right-3 text-[10px] font-bold tracking-wide bg-[#1e293b] text-white px-2 py-0.5 rounded-full">POPULAIRE</span>
-                  <p className="text-[11px] font-semibold tracking-widest uppercase text-[#1e293b]">Annuel</p>
-                  <p className="text-[20px] font-bold mt-1 leading-none">12€<span className="text-[12px] font-medium text-[#64748b]">/mois</span></p>
-                </div>
-              </div>
-
-              <button
-                onClick={handleUpgrade}
-                className="mt-6 w-full h-[46px] rounded-[12px] bg-[#1e293b] text-white font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-black transition-colors shadow-[0_4px_12px_rgba(30,41,59,0.25)]"
-              >
-                <Crown className="w-4 h-4" />
-                Débloquer DetectAI Pro
-                <ArrowRight className="w-4 h-4 opacity-70" />
-              </button>
-
-              <p className="text-[11px] text-[#94a3b8] text-center mt-3">
-                Paiement sécurisé par LemonSqueezy • Annulation en 1 clic
-              </p>
-              <div className="mt-3 text-center">
-                <a href={LEMON_CHECKOUT_URL} target="_blank" rel="noopener" className="text-[11px] font-medium text-[#475569] underline underline-offset-4 hover:text-[#0f172a]">
-                  Ouvrir {LEMON_CHECKOUT_URL}
-                </a>
-              </div>
-
-              <div className="mt-4 text-center">
-                <button onClick={() => setShowPaywall(false)} className="text-[12px] font-medium text-[#64748b] hover:text-[#0f172a] underline underline-offset-4">
-                  Continuer en gratuit (reste {remainingFree})
-                </button>
-              </div>
-            </div>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-[24px] p-6 max-w-md w-full text-center shadow-2xl">
+            <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto text-2xl">🔒</div>
+            <h2 className="text-2xl font-bold mt-4">{tr.limite}</h2>
+            <p className="text-slate-500 mt-2 text-sm">{tr.limiteDesc}</p>
+            <button onClick={handleUpgrade} className="mt-6 w-full bg-slate-900 text-white py-4 rounded-2xl font-bold">{tr.debloquer}</button>
+            <button onClick={() => setShowPaywall(false)} className="mt-3 text-sm text-slate-400 underline">Fermer</button>
           </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes in { from { transform: translateY(8px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-        .scrollbar-none::-webkit-scrollbar { display: none; }
-        .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
     </div>
-  );
-}
-
-// Extend Window for LemonSqueezy
-declare global {
-  interface Window {
-    LemonSqueezy?: any;
-  }
+  )
 }
